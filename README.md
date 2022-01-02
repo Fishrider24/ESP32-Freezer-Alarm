@@ -6,6 +6,9 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 
+***Need to add .txt files to the Data Folder as below***
+check.txt, email.txt, epass.txt, input.txt, input3.txt, ip.txt, pass.txt and ssid.txt
+
 Libraries Used:
 ESPAsyncWebServer--This and AsyncTCP installed using DS18B20 tutorial
 AsyncTCP           @ https://randomnerdtutorials.com/esp32-ds18b20-temperature-arduino-ide/ 
