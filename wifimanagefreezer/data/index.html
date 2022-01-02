@@ -1,0 +1,65 @@
+<!DOCTYPE HTML><html>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Freezer Alarm">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <style>
+    html {
+     font-family: Arial;
+     display: inline-block;
+     margin: 0px auto;
+     text-align: center;
+    }
+    h2 { font-size: 3.0rem; }
+    h3 { font-size: 1.2rem; }
+    p { font-size: 3.0rem; }
+    .units { font-size: 1.2rem; }
+    .ds-labels{
+      font-size: 1.5rem;
+      vertical-align:middle;
+      padding-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Freezer Alarm Server</h2>
+  <p>
+    <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> 
+    <span class="ds-labels">Temperature Fahrenheit</span>
+    <span id="temperaturef">%TEMPERATUREF%</span>
+    <sup class="units">&deg;F</sup>
+  </p>
+  <h2>ESP Email Notification</h2>
+  <form action="/get">
+    Email Address <input type="email" name="email_input" value="%EMAIL_INPUT%" required><br>
+    @vtext.com for Verizon, @txt.att.net for AT&T<br>
+    Enable Email Notification <input type="checkbox" name="enable_email_input" value="true" %ENABLE_EMAIL%><br>
+    Temperature Threshold <input type="number" step="0.1" name="threshold_input" value="%THRESHOLD%" required><br>
+    <input type="submit" value="Submit">
+  </form>
+  <h3>Last received packet:<br><span id="timenow">%TIMESTAMP%<br/></span></h3>
+</body>
+<script>
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("temperaturef").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/temperaturef", true);
+  xhttp.send();
+}, 10000) ;
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("timenow").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/timenow", true);
+  xhttp.send();
+}, 10000) ;
+</script>
+</html>
