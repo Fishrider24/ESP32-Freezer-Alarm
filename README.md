@@ -6,7 +6,7 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 
-https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/freeze.png
+![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/freeze.png)
 
 ***Need to add .txt files to the Data Folder as below***
 check.txt, email.txt, epass.txt, input.txt, input3.txt, ip.txt, pass.txt and ssid.txt
