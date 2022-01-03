@@ -1,5 +1,5 @@
 # ESP32-Freezer-Alarm
-ESP32 Temp Alarm using DS18B20, wifi manager, Email alert Threshold
+ESP32 Temp Alarm using DS18B20, wifi manager, Email alert Threshold. 
 I made this alarm using several tutorials from https://randomnerdtutorials.com/.
 It has a Wifi Manager, so you dont have to hard code the wifi data into it.
 Uses a DS18B20 waterproof sensor.
