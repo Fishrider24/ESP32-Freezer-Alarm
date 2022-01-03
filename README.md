@@ -6,7 +6,7 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 
-To use, make sure all the libraries labeled below are install in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
+To use, make sure all the libraries labeled below are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
 Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the eight .txt files, two html files and one css file. 
 
 ***Need to add .txt files to the Data Folder as below***
@@ -69,9 +69,10 @@ Rui Santos
   
 ******If Using Raspberry Pi to program ESP32*******
 
-Library required: ESP32 Mail Client(Had to downoad newest version from there wesite and manually install using Pi.
+Library required: ESP32 Mail Client(Had to downoad newest version from their website and manually install using Pi.
 Enable Less secure app access on Gmail account
 
 Running ESP32 Filesystem Uploader
 Make a folder called tools in the /home/pi/Arduino folder and unzip ESP32FS into the tools folder
+Should look like this /home/pi/Arduino/tools/ESP32FS/
 ##############################
