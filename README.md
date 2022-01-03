@@ -6,6 +6,8 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 
+To use, make sure all the libraries labeled below are install in your Arduino IDE. Put the make a folder
+Called FreezerAlarm
 ![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/freeze.png)
 
 ***Need to add .txt files to the Data Folder as below***
