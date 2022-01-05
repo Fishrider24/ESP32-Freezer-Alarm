@@ -28,7 +28,7 @@ ESP32 Mail Client 2.1.6
 
 ![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifimanager.jpeg)
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifimanager.jpeg width="100">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifimanager.jpeg" width="100">
 
 ***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts***
 
