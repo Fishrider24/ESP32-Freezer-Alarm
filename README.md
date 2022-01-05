@@ -12,7 +12,7 @@ Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data 
 ***Need to add .txt files to the Data Folder as below***
 check.txt, email.txt, epass.txt, input.txt, input3.txt, ip.txt, pass.txt and ssid.txt
 
-![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/freeze.png)
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png" width="200">
 
 Libraries Used:
 ESPAsyncWebServer--This and AsyncTCP installed using DS18B20 tutorial
@@ -30,15 +30,15 @@ ESP32 Mail Client 2.1.6
 
 ***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts***
 
-![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifisetup.png)
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifisetup.png" width="200">
 
 ***Then the System will Reboot and go to the ip address that you set or defaulted 192.168.1.200***
 
-![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/restart.png)
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/restart.png" width="200">
 
 ***Type in the IP address in your browser
 
-![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png)
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png" width="200">
 
 ***Check bottom if programming from Raspberry Pi***
 
