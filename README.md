@@ -24,6 +24,22 @@ DallasTemperature 3.9.0
 
 ESP32 Mail Client 2.1.6
 
+***After first power-up, Connect to the ESP32 wifi*** 
+
+![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifimanager.jpeg)
+
+***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts***
+
+![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifisetup.png)
+
+***Then the System will Reboot and go to the ip address that you set or defaulted 192.168.1.200***
+
+![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/restart.png)
+
+***Type in the IP address in your browser
+
+![Image1](https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png)
+
 ***Check bottom if programming from Raspberry Pi***
 
 Tutorials used below
