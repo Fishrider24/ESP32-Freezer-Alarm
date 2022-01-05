@@ -1,5 +1,9 @@
 
 /*********
+  Evan Potts
+  Freezer WiFi alarm
+  Made using code and tutorials from below:
+
   Rui Santos
   Complete instructions at https://RandomNerdTutorials.com/esp32-wi-fi-manager-asyncwebserver/
   Complete project details at https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/
