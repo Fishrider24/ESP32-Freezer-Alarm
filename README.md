@@ -7,10 +7,10 @@ Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 
 To use, make sure all the libraries labeled below are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
-Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the eight .txt files, two html files and one css file. 
+Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the nine .txt files, two html files and one css file. 
 
 ***Need to add .txt files to the Data Folder as below***
-check.txt, email.txt, epass.txt, input.txt, input3.txt, ip.txt, pass.txt and ssid.txt
+check.txt, email.txt, epass.txt, input.txt, inputcc.txt, input3.txt, ip.txt, pass.txt and ssid.txt
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png" width="200">
 
