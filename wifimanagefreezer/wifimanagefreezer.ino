@@ -54,10 +54,12 @@ const int   daylightOffset_sec = 3600;
 
 // Default Recipient Email Address
 String inputMessage;
+String inputMessagecc;
 //String enableEmailChecked = "checked";
 //String inputMessage2 = "true";
 String enableEmailChecked;
 String inputMessage2;
+
 // Default Threshold Temperature Value
 String inputMessage3;
 String lastTemperature;
@@ -79,6 +81,7 @@ const char* PARAM_INPUT_2 = "pass";
 const char* PARAM_INPUT_3 = "ip";
 const char* PARAM_INPUT_7 = "emailSender";
 const char* PARAM_INPUT_8 = "emailSenderPass";
+const char* PARAM_INPUT_9 = "email_inputcc";
 
 //Variables to save values from HTML form
 String ssid;
@@ -96,6 +99,7 @@ const char* ipPath = "/ip.txt";
 const char* emailSenderPath = "/email.txt";
 const char* emailSenderPassPath = "/epass.txt";
 const char* inputMessagePath = "/input.txt";
+const char* inputMessageccPath = "/inputcc.txt";
 const char* inputMessage2Path = "/check.txt";
 const char* inputMessage3Path = "/input3.txt";
 
@@ -182,6 +186,9 @@ String processor(const String& var){
   }
   else if(var == "EMAIL_INPUT"){
     return inputMessage;
+  }
+  else if(var == "EMAIL_INPUTCC"){
+    return inputMessagecc;
   }
   else if(var == "ENABLE_EMAIL"){
     return enableEmailChecked;
@@ -278,6 +285,7 @@ void setup() {
   emailSenderAccount = readFile(SPIFFS, emailSenderPath);
   emailSenderPassword = readFile(SPIFFS, emailSenderPassPath);
   inputMessage = readFile(SPIFFS, inputMessagePath);
+  inputMessagecc = readFile(SPIFFS, inputMessageccPath);
   inputMessage2 = readFile(SPIFFS, inputMessage2Path);
   inputMessage3 = readFile(SPIFFS, inputMessage3Path);
   Serial.println(ssid);
@@ -286,6 +294,7 @@ void setup() {
   Serial.println(emailSenderAccount);
   Serial.println(emailSenderPassword);
   Serial.println(inputMessage);
+  Serial.println(inputMessagecc);
   Serial.println(inputMessage2);
   Serial.println(inputMessage3);
 
@@ -317,6 +326,12 @@ void setup() {
        Serial.println(inputMessage);
          // Write file to save value
          writeFile(SPIFFS, inputMessagePath, inputMessage.c_str());
+         // GET email_input value on <ESP_IP>/get?email_input=<inputMessagecc>
+       if (request->hasParam(PARAM_INPUT_9)) {
+         inputMessagecc = request->getParam(PARAM_INPUT_9)->value();
+         Serial.println(inputMessagecc);
+         // Write file to save value
+         writeFile(SPIFFS, inputMessageccPath, inputMessagecc.c_str());
        // GET enable_email_input value on <ESP_IP>/get?enable_email_input=<inputMessage2>
        if (request->hasParam(PARAM_INPUT_5)) {
          inputMessage2 = request->getParam(PARAM_INPUT_5)->value();
@@ -339,10 +354,12 @@ void setup() {
          writeFile(SPIFFS, inputMessage3Path, inputMessage3.c_str());
        }
       }
+      }
      else {
        inputMessage = "No message sent";
     }
     Serial.println(inputMessage);
+    Serial.println(inputMessagecc);
     Serial.println(inputMessage2);
     Serial.println(inputMessage3);
     request->send(200, "text/html", "HTTP GET request sent to your ESP. Controller will restart.<br><a href=\"/\">Return to Home Page</a>");
@@ -490,7 +507,10 @@ bool sendEmailNotification(String emailMessage){
 
   // Add recipients
   smtpData.addRecipient(inputMessage);
-
+  
+  if(inputMessagecc != ""){
+      smtpData.addCC(inputMessagecc);
+  }
   smtpData.setSendCallback(sendCallback);
 
   // Start sending Email, can be set callback function to track the status
