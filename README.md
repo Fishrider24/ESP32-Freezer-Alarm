@@ -36,7 +36,7 @@ ESP32 Mail Client 2.1.6
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/restart.png" width="200">
 
-***Type in the IP address in your browser
+***!!Make sure to reconnect to your WiFi!! Type in the IP address in your browser
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png" width="200">
 
