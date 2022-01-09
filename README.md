@@ -6,6 +6,10 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/board.jpeg" width="200">
+
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/boardback.jpeg" width="200">
+
 To use, make sure all the libraries labeled below are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
 Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the nine .txt files, two html files and one css file. 
 
@@ -55,6 +59,8 @@ Rui Santos
   Complete instructions at https://RandomNerdTutorials.com/esp32-wi-fi-manager-asyncwebserver/
   
 Libraries Required:ESPAsyncWebServer, AsyncTCP
+
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/pinout.jpeg" width="200">
 
 ***Wire Using this tutorial***
 
