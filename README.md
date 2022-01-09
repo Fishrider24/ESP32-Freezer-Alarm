@@ -98,6 +98,7 @@ Running ESP32 Filesystem Uploader
 Make a folder called tools in the /home/pi/Arduino folder and unzip ESP32FS into the tools folder
 Should look like this /home/pi/Arduino/tools/ESP32FS/
 ##############################
+
 Made a remix of a case on Thingiverse. https://www.thingiverse.com/thing:5193607
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/magnet.jpeg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/pageip.jpeg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifisetup.jpeg" width="200">
