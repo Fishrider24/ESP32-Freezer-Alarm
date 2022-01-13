@@ -266,11 +266,13 @@ bool initWiFi() {
   }
 
   Serial.println(WiFi.localIP());
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();
   return true;
 
 // Init and get the time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  printLocalTime();
+/*  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();*/
 }
 
 void setup() {
@@ -279,8 +281,8 @@ void setup() {
 
   initSPIFFS();
 // Init and get the time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  printLocalTime();
+/*  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();*/
   
   // Load values saved in SPIFFS
   ssid = readFile(SPIFFS, ssidPath);
