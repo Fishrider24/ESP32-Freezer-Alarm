@@ -32,7 +32,7 @@ ESP32 Mail Client 2.1.6
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifimanager.jpeg" width="200">
 
-***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts***
+***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts. If using gmail set a app password in gmail settings.***
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifisetup.png" width="200">
 
@@ -92,7 +92,7 @@ Rui Santos
 ******If Using Raspberry Pi to program ESP32*******
 
 Library required: ESP32 Mail Client(Had to downoad newest version from their website and manually install using Pi.
-Enable Less secure app access on Gmail account
+Set an App Password on your Gmail account!!
 
 Running ESP32 Filesystem Uploader
 Make a folder called tools in the /home/pi/Arduino folder and unzip ESP32FS into the tools folder
