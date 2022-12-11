@@ -48,7 +48,7 @@ const long  gmtOffset_sec = -21600;
 const int   daylightOffset_sec = 3600;
 
 // To send Email using Gmail use port 465 (SSL) and SMTP Server smtp.gmail.com
-// YOU MUST ENABLE less secure app option https://myaccount.google.com/lesssecureapps?pli=1
+// YOU MUST Create a App Password!!
 #define smtpServer            "smtp.gmail.com"
 #define smtpServerPort        465
 #define emailSubject          "[ALERT] ESP32 Temperature"
