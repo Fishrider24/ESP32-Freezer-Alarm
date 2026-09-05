@@ -49,11 +49,11 @@ Board settings in Arduino.
 
 ***After first power-up, Connect to the ESP32 wifi*** 
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/manager.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
 
 ***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts. If using gmail set a app password in gmail settings.***
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/manager.png" width="200">
 
 ***Then the System will Reboot and go to the ip address that you set or defaulted 192.168.1.200***
 
