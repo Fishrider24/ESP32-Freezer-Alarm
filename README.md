@@ -21,6 +21,7 @@ It has a Wifi Manager, so you dont have to hard code the wifi data into it.
 Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
+You will need to setup app passwords in gmail. https://support.google.com/mail/answer/185833?hl=en
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">
 
