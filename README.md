@@ -22,14 +22,14 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/board.jpeg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/boardback.jpeg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
 
 To use, make sure all the libraries labeled below are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
 Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the nine .txt files, two html files and one css file. 
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/alarmwebpage.png" width="200">
 
 Main library updates:
     - ESP32 Arduino core 3.x
@@ -45,19 +45,19 @@ Smtp server as Gmail(lines 64,65) and gmtOffset(lines 56-58) for timezone are st
 
 ***After first power-up, Connect to the ESP32 wifi*** 
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifimanager.jpeg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
 
 ***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts. If using gmail set a app password in gmail settings.***
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/wifisetup.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.png" width="200">
 
 ***Then the System will Reboot and go to the ip address that you set or defaulted 192.168.1.200***
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/restart.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/restart.png" width="200">
 
 ***!!Make sure to reconnect to your WiFi!! Type in the IP address in your browser
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/alarmwebpage.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/alarmwebpage.png" width="200">
 
 Set an App Password on your Gmail account!!
 
