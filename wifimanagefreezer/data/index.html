@@ -23,13 +23,13 @@
   </style>
 </head>
 <body>
-  <h2>Freezer Alarm Server</h2>
-  <p>
-    <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> 
-    <span class="ds-labels">Temperature Fahrenheit</span>
-    <span id="temperaturef">%TEMPERATUREF%</span>
-    <sup class="units">&deg;F</sup>
-  </p>
+    <h2>%FREEZER_NAME%</h2>
+    <p>
+        <i class="fas fa-thermometer-half" style="color:#059e8a;"></i>
+        <span class="ds-labels">Temperature %TEMP_UNIT%</span><br>
+        <span id="temperature">%TEMPERATUREF%</span>
+        <sup class="units">&deg;<span id="tempunit">%TEMP_UNIT%</span></sup>
+    </p>
   <h2>ESP Email Notification</h2>
   <form action="/get">
     Email Address <input type="email" name="email_input" value="%EMAIL_INPUT%" required><br>
@@ -40,27 +40,45 @@
     <input type="submit" value="Submit">
   </form>
   <h3>Last received packet:<br><span id="timenow">%TIMESTAMP%<br/></span></h3>
+  <div>
+      <a href="/wifimanager">
+          <button type="button">Setup</button>
+      </a>
+  </div>  
 </body>
 <script>
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("temperaturef").innerHTML = this.responseText;
+    function updateTemperature() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("temperature").innerHTML = this.responseText;
+            }
+        };
+
+        var unit = "%TEMP_UNIT%";
+        var endpoint = unit === "C" ? "/temperaturec" : "/temperaturef";
+
+        xhttp.open("GET", endpoint, true);
+        xhttp.send();
     }
-  };
-  xhttp.open("GET", "/temperaturef", true);
-  xhttp.send();
-}, 10000) ;
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("timenow").innerHTML = this.responseText;
+
+    function updateTime() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("timenow").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/timenow", true);
+        xhttp.send();
     }
-  };
-  xhttp.open("GET", "/timenow", true);
-  xhttp.send();
-}, 10000) ;
+
+    // Update immediately when the page loads
+    updateTemperature();
+    updateTime();
+
+    // Continue updating every 10 seconds
+    setInterval(updateTemperature, 10000);
+    setInterval(updateTime, 10000);
 </script>
 </html>

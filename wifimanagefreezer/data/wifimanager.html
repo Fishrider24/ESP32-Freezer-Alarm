@@ -14,24 +14,42 @@
   <div class="content">
     <div class="card-grid">
       <div class="card">
-        <form action="/" method="POST">
-          <p>
-            <label for="ssid">SSID</label>
-            <input type="text" id ="ssid" name="ssid"><br>
-            <label for="pass">Password</label>
-            <input type="text" id ="pass" name="pass"><br>
-            <label for="ip">IP Address</label>
-            <input type="text" id ="ip" name="ip" value="192.168.1.200"><br>
-            <label for="emailSender">Email Sender Address</label>
-            <input type="text" id ="emailSender" name="emailSender"><br>
-            <label for="emailSenderPass">Email Sender Password</label>
-            <input type="text" id ="emailSenderPass" name="emailSenderPass">
-            <input type ="submit" value ="Submit">
-          </p>
+        <form action="/wifimanager" method="POST">
+            <p>
+                <label for="ssid">Freezer Name</label>
+                <input type="text" id="freezername" name="freezername" value="%FREEZER_NAME%"><br>
+                <label for="ssid">SSID</label>
+                <input type="text" id="ssid" name="ssid"><br>
+                <label for="pass">Password</label>
+                <input type="password" id="pass" name="pass"><br>
+                <label for="ip">IP Address</label>
+                <input type="text" id="ip" name="ip" value="%IP_ADDRESS%"><br>
+                <label for="ip">GateWay Address</label>
+                <input type="text" id="gateway" name="gateway" value="%GATEWAY_ADDRESS%"><br>
+                <label for="emailSender">Email Sender Address</label>
+                <input type="text" id="emailSender" name="emailSender"><br>
+                <label for="emailSenderPass">Email Sender Password</label>
+                <input type="password" id="emailSenderPass" name="emailSenderPass"><br>
+                <label>Temperature Unit</label><br>
+
+                <label>
+                    <input type="radio" name="temp_unit" value="F" %TEMP_UNIT_F%>
+                    Fahrenheit (°F)
+                </label>
+
+                <label>
+                    <input type="radio" name="temp_unit" value="C" %TEMP_UNIT_C%>
+                    Celsius (°C)
+                </label>
+
+                <br><br>
+                <input type="submit" value="Submit">
+            </p>
         </form>
-        <form action="/" method="POST">
+        <form action="/wifimanager" method="POST">
           <p>
             <label for="reboot"></label>
+            <input type="hidden" name="reboot" value="true">
             <input type ="submit" value ="Restart">
           </p>
         </form>
