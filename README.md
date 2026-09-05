@@ -67,4 +67,4 @@ Set an App Password on your Gmail account!!
 
 Made a remix of a case on Thingiverse. https://www.thingiverse.com/thing:5193607
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/magnet.jpeg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/pageip.jpeg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.jpeg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/magnet.jpeg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/pageip.jpg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.jpg" width="200">
