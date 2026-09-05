@@ -27,9 +27,9 @@ Has an email alert if Sensortemp reading goes over setpoint, and alerts when it 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
 
 To use, make sure all the libraries labeled below are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
-Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the nine .txt files, two html files and one css file. 
+Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the two html files and one css file. 
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/alarmwebpage.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
 
 Main library updates:
     - ESP32 Arduino core 3.x
@@ -49,7 +49,7 @@ Board settings in Arduino.
 
 ***After first power-up, Connect to the ESP32 wifi*** 
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/manager.png" width="200">
 
 ***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts. If using gmail set a app password in gmail settings.***
 
@@ -61,7 +61,7 @@ Board settings in Arduino.
 
 ***!!Make sure to reconnect to your WiFi!! Type in the IP address in your browser
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/alarmwebpage.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
 
 Set an App Password on your Gmail account!!
 
