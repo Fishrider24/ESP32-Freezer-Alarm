@@ -43,6 +43,10 @@ Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause comp
 
 Smtp server as Gmail(lines 64,65) and gmtOffset(lines 56-58) for timezone are still hard coded.  Change as needed
 
+Board settings in Arduino.
+
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200">
+
 ***After first power-up, Connect to the ESP32 wifi*** 
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
