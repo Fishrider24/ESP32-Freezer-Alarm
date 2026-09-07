@@ -696,6 +696,14 @@ void startNormalWebServer() {
     restartRequested = true;
   });
   server.on("/wifimanager", HTTP_POST, [](AsyncWebServerRequest* request) {
+    if (request->hasParam("wipeall", true)) {
+      wipeAllSettings();
+      request->send(200, "text/html",
+                    "All settings wiped. Restarting...");
+
+      restartRequested = true;
+      return;
+    }
     bool influxWasEnabled = false;
     int params = request->params();
     for (int i = 0; i < params; i++) {
@@ -778,6 +786,13 @@ void startWiFiManagerServer() {
   server.serveStatic("/", SPIFFS, "/");
 
   server.on("/wifimanager", HTTP_POST, [](AsyncWebServerRequest* request) {
+    if (request->hasParam("wipeall", true)) {
+      wipeAllSettings();
+      request->send(200, "text/html",
+                    "All settings wiped. Restarting...");
+      restartRequested = true;
+      return;
+    }
     bool influxWasEnabled = false;
 
     int params = request->params();
@@ -872,7 +887,7 @@ void createDefaultFiles() {
     writeFile(SPIFFS, "/influxpassword.txt", "");
 
   if (!SPIFFS.exists("/influxmeasurement.txt"))
-    writeFile(SPIFFS, "/influxmeasurement.txt", "temperature");
+    writeFile(SPIFFS, "/influxmeasurement.txt", "freezertemp");
 
   if (!SPIFFS.exists("/timeformat.txt"))
     writeFile(SPIFFS, "/timeformat.txt", "12");
@@ -881,6 +896,37 @@ void createDefaultFiles() {
     writeFile(SPIFFS, "/timezone.txt", "CST6CDT,M3.2.0,M11.1.0");
 }
 
+// -----------------------------------------------------------------------------
+// Wipeall Function
+// -----------------------------------------------------------------------------
+
+void wipeAllSettings() {
+  Serial.println("Wiping all saved settings...");
+
+  writeFile(SPIFFS, freezernamePath, "Freezer");
+  writeFile(SPIFFS, ssidPath, "");
+  writeFile(SPIFFS, passPath, "");
+  writeFile(SPIFFS, ipPath, "192.168.1.200");
+  writeFile(SPIFFS, gatewayPath, "192.168.1.1");
+
+  writeFile(SPIFFS, emailSenderPath, "");
+  writeFile(SPIFFS, emailSenderPassPath, "");
+  writeFile(SPIFFS, inputMessagePath, "");
+  writeFile(SPIFFS, inputMessageccPath, "");
+  writeFile(SPIFFS, inputMessage2Path, "false");
+  writeFile(SPIFFS, inputMessage3Path, "");
+  writeFile(SPIFFS, timeFormatPath, "12");
+
+  writeFile(SPIFFS, influxEnabledPath, "false");
+  writeFile(SPIFFS, influxServerPath, "");
+  writeFile(SPIFFS, influxPortPath, "8086");
+  writeFile(SPIFFS, influxDatabasePath, "");
+  writeFile(SPIFFS, influxUsernamePath, "");
+  writeFile(SPIFFS, influxPasswordPath, "");
+  writeFile(SPIFFS, influxMeasurementPath, "freezertemp");
+
+  Serial.println("All settings wiped except temperature unit and time zone.");
+}
 // -----------------------------------------------------------------------------
 // BOOT button Wi-Fi reset
 // -----------------------------------------------------------------------------
