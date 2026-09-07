@@ -15,20 +15,20 @@
     <div class="card-grid">
       <div class="card">
         <form action="/wifimanager" method="POST">
-            <p>
-                <label for="ssid">Freezer Name</label>
+            <p style="line-height: .8;">
+                <label for="ssid">Freezer Name</label><br>
                 <input type="text" id="freezername" name="freezername" value="%FREEZER_NAME%"><br>
-                <label for="ssid">SSID</label>
+                <label for="ssid">SSID</label><br>
                 <input type="text" id="ssid" name="ssid"><br>
-                <label for="pass">Password</label>
+                <label for="pass">Password</label><br>
                 <input type="password" id="pass" name="pass"><br>
-                <label for="ip">IP Address</label>
+                <label for="ip">IP Address</label><br>
                 <input type="text" id="ip" name="ip" value="%IP_ADDRESS%"><br>
-                <label for="ip">GateWay Address</label>
+                <label for="ip">Gateway Address</label><br>
                 <input type="text" id="gateway" name="gateway" value="%GATEWAY_ADDRESS%"><br>
-                <label for="emailSender">Email Sender Address</label>
+                <label for="emailSender">Email Sender Address</label><br>
                 <input type="text" id="emailSender" name="emailSender"><br>
-                <label for="emailSenderPass">Email Sender Password</label>
+                <label for="emailSenderPass">Email Sender Password</label><br>
                 <input type="password" id="emailSenderPass" name="emailSenderPass"><br>
                 <label>Temperature Unit</label><br>
 
@@ -40,20 +40,55 @@
                 <label>
                     <input type="radio" name="temp_unit" value="C" %TEMP_UNIT_C%>
                     Celsius (°C)
-                </label>
+                </label><br>
+                <label for="time_format">Time Format</label>
+                <select name="time_format" id="time_format">
+                    <br>
+                    <option value="12" %TIME_FORMAT_12%>12-hour</option>
+                    <option value="24" %TIME_FORMAT_24%>24-hour</option>
+                </select><br>
+                <label for="time_zone">Time Zone</label><br>
+                <input type="text"
+                       name="time_zone"
+                       id="time_zone"
+                       value="%TIME_ZONE%"
+                       placeholder="CST6CDT,M3.2.0,M11.1.0"><br>
+
+                <small>
+                    Examples:<br>
+                    Central: CST6CDT,M3.2.0,M11.1.0<br>
+                    London: GMT0BST,M3.5.0/1,M10.5.0/2
+                </small>
+                <br><br>
+                <input type="submit" value="Submit"><br><br>
+                <button type="submit" name="reboot" value="true">Restart</button><br>
+
+                <label>
+                    <input type="checkbox" name="influx_enabled" value="true" %INFLUX_ENABLED%>
+                    Enable InfluxDB
+                </label><br>
+
+                <label>InfluxDB Server IP</label><br>
+                <input type="text" name="influx_server" value="%INFLUX_SERVER%" placeholder="192.168.1.50"><br>
+
+                <label>InfluxDB Port</label><br>
+                <input type="text" name="influx_port" value="%INFLUX_PORT%" placeholder="8086"><br>
+
+                <label>InfluxDB Database</label><br>
+                <input type="text" name="influx_database" value="%INFLUX_DATABASE%" placeholder="freezer"><br>
+
+                <label>InfluxDB Username</label><br>
+                <input type="text" name="influx_username" value="%INFLUX_USERNAME%"><br>
+
+                <label>InfluxDB Password</label><br>
+                <input type="password" name="influx_password" value="%INFLUX_PASSWORD%"><br>
+
+                <label>InfluxDB Measurement</label><br>
+                <input type="text" name="influx_measurement" value="%INFLUX_MEASUREMENT%" placeholder="temperature">
 
                 <br><br>
-                <input type="submit" value="Submit">
             </p>
-        </form>
-        <form action="/wifimanager" method="POST">
-          <p>
-            <label for="reboot"></label>
-            <input type="hidden" name="reboot" value="true">
-            <input type ="submit" value ="Restart">
-          </p>
-        </form>
-      </div>
+        </div>
     </div>
   </div>
 </body>
