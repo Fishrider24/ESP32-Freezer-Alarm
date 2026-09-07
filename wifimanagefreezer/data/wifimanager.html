@@ -83,9 +83,14 @@
                 <label>InfluxDB Password</label><br>
                 <input type="password" name="influx_password" value="%INFLUX_PASSWORD%"><br>
 
-                <label>InfluxDB Measurement</label><br>
-                <input type="text" name="influx_measurement" value="%INFLUX_MEASUREMENT%" placeholder="temperature">
-
+                <label>InfluxDB Measurement Name</label><br>
+                <input type="text" name="influx_measurement" value="%INFLUX_MEASUREMENT%" placeholder="freezertemp"><br>
+                <button type="submit"
+                        name="wipeall"
+                        value="true"
+                        onclick="return confirm('WARNING: This will erase ALL saved settings and restart the ESP32. Are you sure?');">
+                    Wipe All Settings
+                </button><br>
                 <br><br>
             </p>
         </div>
