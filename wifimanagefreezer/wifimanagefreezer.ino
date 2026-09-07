@@ -9,11 +9,12 @@
 
   Main library updates:
     - ESP32 Arduino core 3.x
-    - ESP32Async ESPAsyncWebServer
-    - ESP32Async AsyncTCP
+    - ESP32Async ESPAsyncWebServer 3.12.0
+    - ESP32Async AsyncTCP 3.5.0
     - DallasTemperature 4.x
     - OneWire 2.3.8
     - ReadyMail 0.4.x (replaces ESP-Mail-Client)
+    - InfluxDB Client for Arduino 3.13.2
 
   The existing SPIFFS files and web pages are intentionally retained so
   existing configuration files can continue to be used.
@@ -29,6 +30,8 @@
 #include <WiFiClientSecure.h>
 #define ENABLE_SMTP
 #include <ReadyMail.h>
+#include <InfluxDbClient.h>
+#include <DNSServer.h>
 
 // -----------------------------------------------------------------------------
 // Hardware
@@ -36,6 +39,11 @@
 
 // DS18B20 data wire is connected to GPIO 4.
 #define ONE_WIRE_BUS 4
+// BOOT button on standard ESP32 development boards.
+#define BOOT_BUTTON_PIN 0
+// InfluxDB Settings
+InfluxDBClient client;
+Point sensorReadings("temperature");
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -49,13 +57,27 @@ String temperatureC = "";
 String timenow;
 String lastTemperature;
 String tempUnit = "F";
+// InfluxDB settings
+String influxEnabled = "false";
+String influxServer;
+String influxPort = "8086";
+String influxDatabase;
+String influxUsername;
+String influxPassword;
+String influxMeasurement = "temperature";
 
 unsigned long lastTemperatureRead = 0;
 const unsigned long temperatureInterval = 30000UL; // 30 seconds
 
+// -----------------------------------------------------------------------------
+// Time/Timezone
+// -----------------------------------------------------------------------------
+
 const char* ntpServer = "pool.ntp.org";
-const long gmtOffset_sec = -21600;       // Central Standard Time
-const int daylightOffset_sec = 3600;     // Daylight Saving Time
+String timeFormat = "12";
+String timeZone = "CST6CDT,M3.2.0,M11.1.0";
+const char* timeFormatPath = "/timeformat.txt";
+const char* timeZonePath = "/timezone.txt";
 
 // -----------------------------------------------------------------------------
 // Email
@@ -101,6 +123,15 @@ const char* PARAM_INPUT_6 = "threshold_input";
 const char* PARAM_INPUT_7 = "emailSender";
 const char* PARAM_INPUT_8 = "emailSenderPass";
 const char* PARAM_INPUT_9 = "email_inputcc";
+const char* PARAM_INFLUX_ENABLED = "influx_enabled";
+const char* PARAM_INFLUX_SERVER = "influx_server";
+const char* PARAM_INFLUX_PORT = "influx_port";
+const char* PARAM_INFLUX_DATABASE = "influx_database";
+const char* PARAM_INFLUX_USERNAME = "influx_username";
+const char* PARAM_INFLUX_PASSWORD = "influx_password";
+const char* PARAM_INFLUX_MEASUREMENT = "influx_measurement";
+const char* PARAM_TIME_FORMAT = "time_format";
+const char* PARAM_TIME_ZONE = "time_zone";
 const char* reboot = "reboot";
 
 // -----------------------------------------------------------------------------
@@ -125,6 +156,13 @@ const char* inputMessageccPath = "/inputcc.txt";
 const char* inputMessage2Path = "/check.txt";
 const char* inputMessage3Path = "/input3.txt";
 const char* tempUnitPath = "/tempunit.txt";
+const char* influxEnabledPath = "/influxenabled.txt";
+const char* influxServerPath = "/influxserver.txt";
+const char* influxPortPath = "/influxport.txt";
+const char* influxDatabasePath = "/influxdatabase.txt";
+const char* influxUsernamePath = "/influxusername.txt";
+const char* influxPasswordPath = "/influxpassword.txt";
+const char* influxMeasurementPath = "/influxmeasurement.txt";
 
 IPAddress localIP;
 String gatewayIP;
@@ -133,8 +171,15 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);
 IPAddress secondaryDNS(8, 8, 4, 4);
 
+DNSServer dnsServer;
+const byte DNS_PORT = 53;
+
 unsigned long lastWiFiReconnect = 0;
 const unsigned long wifiReconnectInterval = 10000UL;
+unsigned long apModeStarted = 0;
+bool apWiFiCheckDone = false;
+unsigned long bootButtonPressedAt = 0;
+bool wifiResetTriggered = false;
 
 // -----------------------------------------------------------------------------
 // Forward declarations
@@ -230,7 +275,13 @@ void printLocalTime() {
   }
 
   char timeStringBuff[64];
-  strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %I:%M:%S", &timeinfo);
+  if (timeFormat == "24") {
+    strftime(timeStringBuff, sizeof(timeStringBuff),
+             "%A, %B %d %Y %H:%M:%S", &timeinfo);
+  } else {
+    strftime(timeStringBuff, sizeof(timeStringBuff),
+             "%A, %B %d %Y %I:%M:%S %p", &timeinfo);
+  }
   timenow = timeStringBuff;
   Serial.println(timeStringBuff);
 }
@@ -262,18 +313,13 @@ String processor(const String& var) {
     return inputMessage3;
   }
   else if (var == "IP_ADDRESS") {
-    String currentIP = WiFi.localIP().toString();
-    if (currentIP != "0.0.0.0") {
-      return currentIP;
-    } else {
-      return "192.168.1.200";
-    }
+    return ip;
   }
   else if (var == "GATEWAY_ADDRESS") {
     if (gatewayIP.length() > 0) {
       return gatewayIP;
     } else {
-      return "192.168.1.1";
+      return "";
     }
   }
   else if (var == "FREEZER_NAME") {
@@ -291,6 +337,33 @@ String processor(const String& var) {
   }
   else if (var == "TEMP_UNIT") {
     return tempUnit;
+  }
+  else if (var == "INFLUX_ENABLED") {
+    return influxEnabled == "true" ? "checked" : "";
+  }
+  else if (var == "INFLUX_SERVER") {
+    return influxServer;
+  }
+  else if (var == "INFLUX_PORT") {
+    return influxPort;
+  }
+  else if (var == "INFLUX_DATABASE") {
+    return influxDatabase;
+  }
+  else if (var == "INFLUX_USERNAME") {
+    return influxUsername;
+  }
+  else if (var == "INFLUX_PASSWORD") {
+    return influxPassword;
+  }
+  else if (var == "INFLUX_MEASUREMENT") {
+    return influxMeasurement;
+  }
+  else if (var == "TIME_FORMAT_12") {
+    return timeFormat == "12" ? "selected" : "";
+  }
+  else if (var == "TIME_FORMAT_24") {
+    return timeFormat == "24" ? "selected" : "";
   }
   return String();
 }
@@ -337,7 +410,7 @@ bool initWiFi() {
   Serial.print("Connected. IP address: ");
   Serial.println(WiFi.localIP());
 
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  configTzTime(timeZone.c_str(), ntpServer, nullptr, nullptr);
   printLocalTime();
 
   return true;
@@ -443,6 +516,128 @@ bool sendEmailNotification(const String& emailMessage) {
 }
 
 // -----------------------------------------------------------------------------
+// Wifimanger Post Handlers
+// -----------------------------------------------------------------------------
+
+void handleWiFiManagerParameter(const AsyncWebParameter* p) {
+
+  if (p->name() == PARAM_INPUT_0 && p->value().length() > 0) {
+    freezername = p->value();
+    writeFile(SPIFFS, freezernamePath, freezername.c_str());
+  }
+
+  else if (p->name() == PARAM_INPUT_1 && p->value().length() > 0) {
+    ssid = p->value();
+    writeFile(SPIFFS, ssidPath, ssid.c_str());
+  }
+
+  else if (p->name() == PARAM_INPUT_2 && p->value().length() > 0) {
+    pass = p->value();
+    writeFile(SPIFFS, passPath, pass.c_str());
+  }
+
+  else if (p->name() == PARAM_INPUT_3 && p->value().length() > 0) {
+    ip = p->value();
+    writeFile(SPIFFS, ipPath, ip.c_str());
+  }
+
+  else if (p->name() == PARAM_INPUT_7 && p->value().length() > 0) {
+    emailSender = p->value();
+    writeFile(SPIFFS, emailSenderPath, emailSender.c_str());
+  }
+
+  else if (p->name() == PARAM_INPUT_8 && p->value().length() > 0) {
+    emailSenderPass = p->value();
+    writeFile(SPIFFS, emailSenderPassPath, emailSenderPass.c_str());
+  }
+
+  else if (p->name() == "temp_unit") {
+    tempUnit = p->value();
+
+    if (tempUnit != "F" && tempUnit != "C") {
+      tempUnit = "F";
+    }
+
+    writeFile(SPIFFS, tempUnitPath, tempUnit.c_str());
+
+    Serial.print("Temperature unit set to: ");
+    Serial.println(tempUnit);
+  }
+
+  else if (p->name() == PARAM_INPUT_GATEWAY && p->value().length() > 0) {
+    gatewayIP = p->value();
+
+    if (gateway.fromString(gatewayIP)) {
+      writeFile(SPIFFS, gatewayPath, gatewayIP.c_str());
+
+      Serial.print("Gateway set to: ");
+      Serial.println(gatewayIP);
+    }
+    else {
+      gateway.fromString("192.168.1.1");
+      gatewayIP = "192.168.1.1";
+    }
+  }
+   // Time settings
+  else if (p->name() == PARAM_TIME_FORMAT) {
+    timeFormat = p->value();
+
+    if (timeFormat != "12" && timeFormat != "24") {
+      timeFormat = "12";
+    }
+
+    writeFile(SPIFFS, timeFormatPath, timeFormat.c_str());
+
+    Serial.print("Time format set to: ");
+    Serial.println(timeFormat);
+  }
+
+  else if (p->name() == PARAM_TIME_ZONE && p->value().length() > 0) {
+    timeZone = p->value();
+
+    writeFile(SPIFFS, timeZonePath, timeZone.c_str());
+
+    Serial.print("Time zone set to: ");
+    Serial.println(timeZone);
+  }
+    // InfluxDB settings
+  else if (p->name() == PARAM_INFLUX_ENABLED) {
+    influxEnabled = "true";
+    writeFile(SPIFFS, influxEnabledPath, influxEnabled.c_str());
+  }
+
+  else if (p->name() == PARAM_INFLUX_SERVER && p->value().length() > 0) {
+    influxServer = p->value();
+    writeFile(SPIFFS, influxServerPath, influxServer.c_str());
+  }
+
+  else if (p->name() == PARAM_INFLUX_PORT && p->value().length() > 0) {
+    influxPort = p->value();
+    writeFile(SPIFFS, influxPortPath, influxPort.c_str());
+  }
+
+  else if (p->name() == PARAM_INFLUX_DATABASE && p->value().length() > 0) {
+    influxDatabase = p->value();
+    writeFile(SPIFFS, influxDatabasePath, influxDatabase.c_str());
+  }
+
+  else if (p->name() == PARAM_INFLUX_USERNAME) {
+    influxUsername = p->value();
+    writeFile(SPIFFS, influxUsernamePath, influxUsername.c_str());
+  }
+
+  else if (p->name() == PARAM_INFLUX_PASSWORD) {
+    influxPassword = p->value();
+    writeFile(SPIFFS, influxPasswordPath, influxPassword.c_str());
+  }
+
+  else if (p->name() == PARAM_INFLUX_MEASUREMENT && p->value().length() > 0) {
+    influxMeasurement = p->value();
+    writeFile(SPIFFS, influxMeasurementPath, influxMeasurement.c_str());
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Web server setup
 // -----------------------------------------------------------------------------
 
@@ -493,102 +688,65 @@ void startNormalWebServer() {
 
     Serial.println("Settings updated. Restarting...");
 
-    request->send(200, "text/plain",
-              "Settings saved. Restarting...");
+    request->send(200, "text/html",
+              "Settings saved. Restarting...<br>"
+              "<a href=\"/\">Return to Home</a>");
     delay(1000);
     request->redirect("/");
     restartRequested = true;
   });
   server.on("/wifimanager", HTTP_POST, [](AsyncWebServerRequest* request) {
+    bool influxWasEnabled = false;
     int params = request->params();
-
     for (int i = 0; i < params; i++) {
       const AsyncWebParameter* p = request->getParam(i);
-
       if (!p->isPost()) {
         continue;
       }
-
-      if (p->name() == PARAM_INPUT_0 && p->value().length() > 0) {
-        freezername = p->value();
-        writeFile(SPIFFS, freezernamePath, freezername.c_str());
-        Serial.print("Freezer Name set to: ");
-        Serial.println(freezername);
+      if (p->name() == PARAM_INFLUX_ENABLED) {
+        influxWasEnabled = true;
       }
-      else if (p->name() == PARAM_INPUT_1 && p->value().length() > 0) {
-        ssid = p->value();
-        writeFile(SPIFFS, ssidPath, ssid.c_str());
-        Serial.println("SSID updated.");
-      }
-      else if (p->name() == PARAM_INPUT_2 && p->value().length() > 0) {
-        pass = p->value();
-        writeFile(SPIFFS, passPath, pass.c_str());
-        Serial.println("WiFi password updated.");
-      }
-      else if (p->name() == PARAM_INPUT_3 && p->value().length() > 0) {
-        ip = p->value();
-        writeFile(SPIFFS, ipPath, ip.c_str());
-        Serial.print("IP address set to: ");
-        Serial.println(ip);
-      }
-      else if (p->name() == PARAM_INPUT_7 && p->value().length() > 0) {
-        emailSender = p->value();
-        writeFile(SPIFFS, emailSenderPath, emailSender.c_str());
-        Serial.println("Email sender updated.");
-      }
-      else if (p->name() == PARAM_INPUT_8 && p->value().length() > 0) {
-        emailSenderPass = p->value();
-        writeFile(SPIFFS, emailSenderPassPath, emailSenderPass.c_str());
-        Serial.println("Email sender password updated.");
-      }
-      else if (p->name() == "temp_unit") {
-        tempUnit = p->value();
-
-        if (tempUnit != "F" && tempUnit != "C") {
-          tempUnit = "F";
-        }
-
-        writeFile(SPIFFS, tempUnitPath, tempUnit.c_str());
-
-        Serial.print("Temperature unit set to: ");
-        Serial.println(tempUnit);
-      }
-      else if (p->name() == "reboot") {
-        Serial.println("Restart requested.");
+      if (p->name() == "reboot") {
         request->send(200, "text/plain", "Restarting...");
         delay(1000);
         request->redirect("/");
         restartRequested = true;
-        return;
       }
-      else if (p->name() == PARAM_INPUT_GATEWAY && p->value().length() > 0) {
-        gatewayIP = p->value();
-        if (gateway.fromString(gatewayIP)) {
-          writeFile(SPIFFS, gatewayPath, gatewayIP.c_str());
-          Serial.print("Gateway set to: ");
-          Serial.println(gatewayIP);
-        } else {
-          gateway.fromString("192.168.1.1");
-          gatewayIP = "192.168.1.1";
-        }
+      else {
+        handleWiFiManagerParameter(p);
       }
     }
-
-    request->send(200, "text/plain", "Settings saved. Restarting...");
-    delay(1000);
-    request->redirect("/");
-    restartRequested = true;
+    if (!influxWasEnabled) {
+      influxEnabled = "false";
+      writeFile(SPIFFS, influxEnabledPath, influxEnabled.c_str());
+    }
+    if (!restartRequested) {
+      request->send(200, "text/html", 
+                "Settings saved. Restarting...<br>"
+                "<a href=\"/\">Return to Wi-Fi Manager</a>");
+      delay(1000);
+      request->redirect("/");
+      restartRequested = true;
+    }
   });
-
   server.begin();
-  Serial.println("Web server started.");
+  Serial.println("Normal web server started.");
 }
+
+// -----------------------------------------------------------------------------
+// Wifi Manager server setup
+// -----------------------------------------------------------------------------
 
 void startWiFiManagerServer() {
   Serial.println("Setting up WiFi Manager access point.");
 
   WiFi.mode(WIFI_AP);
   WiFi.softAP("ESP-WIFI-MANAGER");
+
+  apModeStarted = millis();
+  apWiFiCheckDone = false;
+
+  dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
@@ -597,9 +755,31 @@ void startWiFiManagerServer() {
     request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
   });
 
+  server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/");
+  });
+
+  server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/");
+  });
+
+  server.on("/connecttest.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/");
+  });
+
+  server.on("/ncsi.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/");
+  });
+
+  server.onNotFound([](AsyncWebServerRequest *request) {
+    request->redirect("/wifimanager");
+  });
+
   server.serveStatic("/", SPIFFS, "/");
 
-  server.on("/", HTTP_POST, [](AsyncWebServerRequest* request) {
+  server.on("/wifimanager", HTTP_POST, [](AsyncWebServerRequest* request) {
+    bool influxWasEnabled = false;
+
     int params = request->params();
 
     for (int i = 0; i < params; i++) {
@@ -608,145 +788,26 @@ void startWiFiManagerServer() {
       if (!p->isPost()) {
         continue;
       }
-      if (p->name() == PARAM_INPUT_0) {
-        freezername = p->value();
-        Serial.print("Freezer Name set to: ");
-        Serial.println(freezername);
-        writeFile(SPIFFS, freezernamePath, freezername.c_str());
+      if (p->name() == PARAM_INFLUX_ENABLED) {
+        influxWasEnabled = true;
       }
-      if (p->name() == PARAM_INPUT_1 && p->value().length() > 0) {
-        ssid = p->value();
-        Serial.print("SSID set to: ");
-        Serial.println(ssid);
-        writeFile(SPIFFS, ssidPath, ssid.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_2 && p->value().length() > 0) {
-        pass = p->value();
-        Serial.println("WiFi password updated.");
-        writeFile(SPIFFS, passPath, pass.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_3 && p->value().length() > 0) {
-        ip = p->value();
-        Serial.print("IP address set to: ");
-        Serial.println(ip);
-        writeFile(SPIFFS, ipPath, ip.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_7 && p->value().length() > 0) {
-        emailSender = p->value();
-        Serial.print("Email sender set to: ");
-        Serial.println(emailSender);
-        writeFile(SPIFFS, emailSenderPath, emailSender.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_8 && p->value().length() > 0) {
-        emailSenderPass = p->value();
-        Serial.println("Email sender password updated.");
-        writeFile(SPIFFS, emailSenderPassPath, emailSenderPass.c_str());
-      }
-      else if (p->name() == "temp_unit") {
-        tempUnit = p->value();
-
-        if (tempUnit != "F" && tempUnit != "C") {
-          tempUnit = "F";
-        }
-
-        writeFile(SPIFFS, tempUnitPath, tempUnit.c_str());
-
-        Serial.print("Temperature unit set to: ");
-        Serial.println(tempUnit);
-      }
-      else if (p->name() == "reboot") {
-        request->send(200, "text/plain", "Restarting...");
-        delay(1000);
-        request->redirect("/");
+      if (p->name() == "reboot") {
         restartRequested = true;
       }
-      else if (p->name() == PARAM_INPUT_GATEWAY && p->value().length() > 0) {
-        gatewayIP = p->value();
-        if (gateway.fromString(gatewayIP)) {
-          writeFile(SPIFFS, gatewayPath, gatewayIP.c_str());
-          Serial.print("Gateway set to: ");
-          Serial.println(gatewayIP);
-        } else {
-          gateway.fromString("192.168.1.1");
-          gatewayIP = "192.168.1.1";
-        }
+      else {
+        handleWiFiManagerParameter(p);
       }
     }
-
+    if (!influxWasEnabled) {
+      influxEnabled = "false";
+      writeFile(SPIFFS, influxEnabledPath, influxEnabled.c_str());
+    }
     request->send(200, "text/plain",
                   "Done. ESP will restart, connect to your router and go to IP address: " + ip);
+
     restartRequested = true;
   });
-  server.on("/wifimanager", HTTP_POST, [](AsyncWebServerRequest* request) {
-    int params = request->params();
 
-    for (int i = 0; i < params; i++) {
-      const AsyncWebParameter* p = request->getParam(i);
-
-      if (!p->isPost()) {
-        continue;
-      }
-
-      if (p->name() == PARAM_INPUT_0 && p->value().length() > 0) {
-        freezername = p->value();
-        writeFile(SPIFFS, freezernamePath, freezername.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_1 && p->value().length() > 0) {
-        ssid = p->value();
-        writeFile(SPIFFS, ssidPath, ssid.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_2 && p->value().length() > 0) {
-        pass = p->value();
-        writeFile(SPIFFS, passPath, pass.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_3 && p->value().length() > 0) {
-        ip = p->value();
-        writeFile(SPIFFS, ipPath, ip.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_7 && p->value().length() > 0) {
-        emailSender = p->value();
-        writeFile(SPIFFS, emailSenderPath, emailSender.c_str());
-      }
-      else if (p->name() == PARAM_INPUT_8 && p->value().length() > 0) {
-        emailSenderPass = p->value();
-        writeFile(SPIFFS, emailSenderPassPath, emailSenderPass.c_str());
-      }
-      else if (p->name() == "temp_unit") {
-        tempUnit = p->value();
-
-        if (tempUnit != "F" && tempUnit != "C") {
-          tempUnit = "F";
-        }
-
-        writeFile(SPIFFS, tempUnitPath, tempUnit.c_str());
-
-        Serial.print("Temperature unit set to: ");
-        Serial.println(tempUnit);
-      }
-      else if (p->name() == "reboot") {
-        request->send(200, "text/plain", "Restarting...");
-        delay(1000);
-        request->redirect("/");
-        restartRequested = true;
-      }
-      else if (p->name() == PARAM_INPUT_GATEWAY && p->value().length() > 0) {
-        gatewayIP = p->value();
-        if (gateway.fromString(gatewayIP)) {
-          writeFile(SPIFFS, gatewayPath, gatewayIP.c_str());
-          Serial.print("Gateway set to: ");
-          Serial.println(gatewayIP);
-        } else {
-          gateway.fromString("192.168.1.1");
-          gatewayIP = "192.168.1.1";
-        }
-      }
-    }
-
-    request->send(200, "text/plain", "Settings saved. Restarting...");
-    delay(1000);
-    request->redirect("/");
-    restartRequested = true;
-  });
   server.begin();
   Serial.println("WiFi Manager web server started.");
 }
@@ -791,6 +852,75 @@ void createDefaultFiles() {
 
   if (!SPIFFS.exists("/tempunit.txt"))
     writeFile(SPIFFS, "/tempunit.txt", "F");
+
+  if (!SPIFFS.exists("/influxenabled.txt"))
+    writeFile(SPIFFS, "/influxenabled.txt", "false");
+
+  if (!SPIFFS.exists("/influxserver.txt"))
+    writeFile(SPIFFS, "/influxserver.txt", "");
+
+  if (!SPIFFS.exists("/influxport.txt"))
+    writeFile(SPIFFS, "/influxport.txt", "8086");
+
+  if (!SPIFFS.exists("/influxdatabase.txt"))
+    writeFile(SPIFFS, "/influxdatabase.txt", "");
+
+  if (!SPIFFS.exists("/influxusername.txt"))
+    writeFile(SPIFFS, "/influxusername.txt", "");
+
+  if (!SPIFFS.exists("/influxpassword.txt"))
+    writeFile(SPIFFS, "/influxpassword.txt", "");
+
+  if (!SPIFFS.exists("/influxmeasurement.txt"))
+    writeFile(SPIFFS, "/influxmeasurement.txt", "temperature");
+
+  if (!SPIFFS.exists("/timeformat.txt"))
+    writeFile(SPIFFS, "/timeformat.txt", "12");
+
+  if (!SPIFFS.exists("/timezone.txt"))
+    writeFile(SPIFFS, "/timezone.txt", "CST6CDT,M3.2.0,M11.1.0");
+}
+
+// -----------------------------------------------------------------------------
+// BOOT button Wi-Fi reset
+// -----------------------------------------------------------------------------
+
+void checkWiFiResetButton() {
+  if (wifiResetTriggered) {
+    return;
+  }
+
+  if (digitalRead(BOOT_BUTTON_PIN) == LOW) {
+
+    if (bootButtonPressedAt == 0) {
+      bootButtonPressedAt = millis();
+
+      Serial.println("BOOT button held.");
+      Serial.println("Hold for 5 seconds to reset Wi-Fi settings.");
+    }
+
+    else if (millis() - bootButtonPressedAt >= 5000) {
+
+      wifiResetTriggered = true;
+
+      Serial.println("Resetting Wi-Fi settings...");
+
+      // Erase Wi-Fi/network settings only.
+      writeFile(SPIFFS, ssidPath, "");
+      writeFile(SPIFFS, passPath, "");
+      writeFile(SPIFFS, ipPath, "");
+      writeFile(SPIFFS, gatewayPath, "");
+
+      Serial.println("Wi-Fi settings erased.");
+      Serial.println("Restarting...");
+
+      delay(500);
+      ESP.restart();
+    }
+  }
+  else {
+    bootButtonPressedAt = 0;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -800,6 +930,7 @@ void createDefaultFiles() {
 void setup() {
   Serial.begin(115200);
   delay(200);
+  pinMode(BOOT_BUTTON_PIN, INPUT_PULLUP);
 
   Serial.println();
   Serial.println("========================================");
@@ -831,12 +962,37 @@ void setup() {
   inputMessage2 = readFile(SPIFFS, inputMessage2Path);
   inputMessage3 = readFile(SPIFFS, inputMessage3Path);
   tempUnit = readFile(SPIFFS, tempUnitPath);
+  influxEnabled = readFile(SPIFFS, influxEnabledPath);
+  influxServer = readFile(SPIFFS, influxServerPath);
+  influxPort = readFile(SPIFFS, influxPortPath);
+  influxDatabase = readFile(SPIFFS, influxDatabasePath);
+  influxUsername = readFile(SPIFFS, influxUsernamePath);
+  influxPassword = readFile(SPIFFS, influxPasswordPath);
+  influxMeasurement = readFile(SPIFFS, influxMeasurementPath);
+  timeFormat = readFile(SPIFFS, timeFormatPath);
+  timeZone = readFile(SPIFFS, timeZonePath);
 
+  if (timeFormat != "12" && timeFormat != "24") {
+    timeFormat = "12";
+  }
+  if (timeZone.length() == 0) {
+    timeZone = "CST6CDT,M3.2.0,M11.1.0";
+  }
+  
+  if (influxEnabled != "true" && influxEnabled != "false") {
+    influxEnabled = "false";
+  }
+  if (influxPort.length() == 0) {
+    influxPort = "8086";
+  }
+  if (influxMeasurement.length() == 0) {
+    influxMeasurement = "temperature";
+  }
   if (tempUnit != "F" && tempUnit != "C") {
     tempUnit = "F";
   }
 
-  // Do not print passwords or other credentials to Serial.
+// Do not print passwords or other credentials to Serial.
   Serial.print("SSID: ");
   Serial.println(ssid);
   Serial.print("Static IP: ");
@@ -859,15 +1015,46 @@ void setup() {
     enableEmailChecked = "";
   }
 
-  // Start the DS18B20 library once during setup.
+// Start the DS18B20 library once during setup.
   sensors.begin();
   sensors.setResolution(12);
-
   readTemperature();
 
-  if (initWiFi()) {
+  if (influxEnabled == "true") {
+    String influxUrl = "http://" + influxServer + ":" + influxPort;
+    client.setConnectionParamsV1(
+      influxUrl,
+      influxDatabase,
+      influxUsername,
+      influxPassword
+    );
+    sensorReadings = Point(influxMeasurement.c_str());
+    Serial.println("InfluxDB 1.8 configured.");
+  }
+  bool wifiConnected = false;
+
+// First Wi-Fi connection attempt
+  Serial.println("Trying to connect to WiFi...");
+  wifiConnected = initWiFi();
+
+  if (!wifiConnected) {
+    Serial.println("First WiFi attempt failed.");
+    Serial.println("Trying again in 2 seconds...");
+
+    WiFi.disconnect(true);
+    delay(2000);
+
+// Second Wi-Fi connection attempt
+    Serial.println("Second WiFi attempt...");
+    wifiConnected = initWiFi();
+  }
+
+  if (wifiConnected) {
+    Serial.println("WiFi connected.");
     startNormalWebServer();
   } else {
+    Serial.println("WiFi connection failed twice.");
+    Serial.println("Starting ESP WiFi Manager...");
     startWiFiManagerServer();
   }
 }
@@ -877,6 +1064,37 @@ void setup() {
 // -----------------------------------------------------------------------------
 
 void loop() {
+  checkWiFiResetButton();
+  if (WiFi.getMode() == WIFI_AP) {
+    dnsServer.processNextRequest();
+  }
+  if (WiFi.getMode() == WIFI_AP &&
+      !apWiFiCheckDone &&
+      millis() - apModeStarted >= 600000UL) { //600000UL = 10 minutes
+    apWiFiCheckDone = true;
+    Serial.println("ESP has been in AP mode for 10 minutes.");
+    Serial.println("Checking normal WiFi connection...");
+// Temporarily try STA mode.
+    WiFi.mode(WIFI_STA);
+    if (initWiFi()) {
+      Serial.println("WiFi is back!");
+      Serial.println("Restarting...");
+      delay(500);
+      ESP.restart();
+    }
+    else {
+      Serial.println("WiFi still unavailable.");
+      Serial.println("Returning to WiFi Manager AP.");
+      WiFi.disconnect(true);
+      delay(100);
+      WiFi.mode(WIFI_AP);
+      WiFi.softAP("ESP-WIFI-MANAGER");
+      dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
+// Start another 10-minute period.
+      apModeStarted = millis();
+      apWiFiCheckDone = false;
+    }
+  }
   unsigned long currentMillis = millis();
 
   // Read temperature and check alarm every 30 seconds.
@@ -888,6 +1106,31 @@ void loop() {
         printLocalTime();
 
         float temperature = sensors.getTempFByIndex(0);
+
+        if (influxEnabled == "true") {
+          float influxTemperature;
+
+          if (tempUnit == "C") {
+            influxTemperature = temperatureC.toFloat();
+          } else {
+            influxTemperature = temperatureF.toFloat();
+          }
+
+          sensorReadings.clearFields();
+          sensorReadings.clearTags();
+
+          sensorReadings.addField("temperature", influxTemperature);
+          sensorReadings.addTag("unit", tempUnit);
+          sensorReadings.addTag("freezer", freezername);
+
+          if (!client.writePoint(sensorReadings)) {
+            Serial.print("InfluxDB write failed: ");
+            Serial.println(client.getLastErrorMessage());
+          } else {
+            Serial.println("Temperature sent to InfluxDB.");
+          }
+        }
+
         float threshold = inputMessage3.toFloat();
 
         // Check if temperature is above threshold and an alert has not already
@@ -929,7 +1172,8 @@ void loop() {
     lastWiFiReconnect = currentMillis;
     Serial.println("Reconnecting to WiFi...");
 
-    WiFi.disconnect();
+    WiFi.disconnect(true);
+    delay(100);
     WiFi.begin(ssid.c_str(), pass.c_str());
   }
   if (restartRequested) {
