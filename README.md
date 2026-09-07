@@ -1,4 +1,5 @@
-# ESP32-Freezer-Alarm Version 2.1!! (3d printed case at bottom)
+# ESP32-Freezer-Alarm Version 2.2!! (3d printed case at bottom)
+Added a WipeAll Button to erase Wifi credentials, ip's, email sender information, and all influxdb settings.
 Added influxdb 1.8, 12/24hr and timezone settings. Also Wifi Captive Portal for initial setup. Also made the bootloader button default wifi settings after holding it for 5 seconds. Better restarts if wifi turns off.
 Make sure to set partition scheme: Partition Scheme: "No OTA (2MB APP/2MB SPIFFS)"
 ESP32 Temp Alarm using DS18B20, wifi manager, Email alert Threshold. 
