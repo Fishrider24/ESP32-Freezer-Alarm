@@ -74,8 +74,10 @@ const unsigned long temperatureInterval = 30000UL; // 30 seconds
 // -----------------------------------------------------------------------------
 
 const char* ntpServer = "pool.ntp.org";
+const char* backupNtpServer = "time.nist.gov";
 String timeFormat = "12";
 String timeZone = "CST6CDT,M3.2.0,M11.1.0";
+bool timeSyncStarted = false;
 const char* timeFormatPath = "/timeformat.txt";
 const char* timeZonePath = "/timezone.txt";
 
@@ -105,6 +107,8 @@ SMTPClient smtp(ssl_client);
 
 // ReadyMail status callback reports SMTP progress and server responses.
 bool emailSent = false;
+bool emailFailurePending = false;
+String emailFailureMessage;
 
 // -----------------------------------------------------------------------------
 // Web server
@@ -176,6 +180,8 @@ const byte DNS_PORT = 53;
 
 unsigned long lastWiFiReconnect = 0;
 const unsigned long wifiReconnectInterval = 10000UL;
+byte wifiReconnectAttempts = 0;
+const byte maxWiFiReconnectAttempts = 10;
 unsigned long apModeStarted = 0;
 bool apWiFiCheckDone = false;
 unsigned long bootButtonPressedAt = 0;
@@ -269,8 +275,14 @@ bool readTemperature() {
 void printLocalTime() {
   struct tm timeinfo;
 
-  if (!getLocalTime(&timeinfo, 5000)) {
-    Serial.println("Failed to obtain time");
+  time_t currentTime = time(nullptr);
+  if (currentTime < 100000) {
+    Serial.println("Time not synchronized yet.");
+    return;
+  }
+
+  if (!getLocalTime(&timeinfo, 250)) {
+    Serial.println("Time is unavailable.");
     return;
   }
 
@@ -286,6 +298,12 @@ void printLocalTime() {
   Serial.println(timeStringBuff);
 }
 
+void startTimeSync() {
+  configTzTime(timeZone.c_str(), ntpServer, backupNtpServer, nullptr);
+  timeSyncStarted = true;
+  Serial.println("NTP time sync started.");
+}
+
 // -----------------------------------------------------------------------------
 // Web page placeholder processor
 // -----------------------------------------------------------------------------
@@ -296,6 +314,9 @@ String processor(const String& var) {
   }
   else if (var == "TEMPERATUREC") {
     return temperatureC;
+  }
+  else if (var == "TEMPERATURE") {
+    return tempUnit == "C" ? temperatureC : temperatureF;
   }
   else if (var == "TIMESTAMP") {
     return timenow;
@@ -410,8 +431,7 @@ bool initWiFi() {
   Serial.print("Connected. IP address: ");
   Serial.println(WiFi.localIP());
 
-  configTzTime(timeZone.c_str(), ntpServer, nullptr, nullptr);
-  printLocalTime();
+  startTimeSync();
 
   return true;
 }
@@ -438,16 +458,22 @@ void smtpCallback(SMTPStatus status) {
 bool sendEmailNotification(const String& emailMessage) {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("Cannot send email: WiFi is not connected.");
+    emailFailureMessage = "Wi-Fi is not connected.";
+    emailFailurePending = true;
     return false;
   }
 
   if (emailSenderAccount.length() == 0 || emailSenderPassword.length() == 0) {
     Serial.println("Cannot send email: sender account/password not configured.");
+    emailFailureMessage = "Sender email or password is not configured.";
+    emailFailurePending = true;
     return false;
   }
 
   if (inputMessage.length() == 0) {
     Serial.println("Cannot send email: recipient is not configured.");
+    emailFailureMessage = "Recipient email address is not configured.";
+    emailFailurePending = true;
     return false;
   }
 
@@ -460,6 +486,8 @@ bool sendEmailNotification(const String& emailMessage) {
 
   if (!smtp.isConnected()) {
     Serial.println("ReadyMail: SMTP connection failed.");
+    emailFailureMessage = "Could not connect to the Gmail SMTP server.";
+    emailFailurePending = true;
     return false;
   }
 
@@ -471,6 +499,8 @@ bool sendEmailNotification(const String& emailMessage) {
 
   if (!smtp.isAuthenticated()) {
     Serial.println("ReadyMail: SMTP authentication failed.");
+    emailFailureMessage = "Gmail SMTP authentication failed. Check the sender email and app password.";
+    emailFailurePending = true;
     return false;
   }
 
@@ -505,13 +535,16 @@ bool sendEmailNotification(const String& emailMessage) {
   }
 
   Serial.println("Sending email...");
-  smtp.send(message);
+  if (!smtp.send(message)) {
+    Serial.println("ReadyMail: email send failed.");
+    emailFailureMessage = "The SMTP server did not accept the email.";
+    emailFailurePending = true;
+    return false;
+  }
 
-  // ReadyMail sends asynchronously.  The current library examples call
-  // smtp.send(message) without waiting for a completion flag.  Reaching this
-  // point means the message was accepted by ReadyMail for sending; the
-  // smtpCallback() above reports the actual SMTP progress/response.
-  Serial.println("ReadyMail: email accepted for sending.");
+  emailFailurePending = false;
+  emailFailureMessage = "";
+  Serial.println("ReadyMail: email sent successfully.");
   return true;
 }
 
@@ -568,6 +601,7 @@ void handleWiFiManagerParameter(const AsyncWebParameter* p) {
     gatewayIP = p->value();
 
     if (gateway.fromString(gatewayIP)) {
+      primaryDNS = gateway;
       writeFile(SPIFFS, gatewayPath, gatewayIP.c_str());
 
       Serial.print("Gateway set to: ");
@@ -576,6 +610,7 @@ void handleWiFiManagerParameter(const AsyncWebParameter* p) {
     else {
       gateway.fromString("192.168.1.1");
       gatewayIP = "192.168.1.1";
+      primaryDNS = gateway;
     }
   }
    // Time settings
@@ -661,6 +696,16 @@ void startNormalWebServer() {
     request->send(200, "text/plain", timenow);
   });
 
+  server.on("/emailstatus", HTTP_GET, [](AsyncWebServerRequest* request) {
+    if (emailFailurePending) {
+      emailFailurePending = false;
+      request->send(200, "text/plain", emailFailureMessage);
+      emailFailureMessage = "";
+    } else {
+      request->send(200, "text/plain", "ok");
+    }
+  });
+
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (request->hasParam(PARAM_INPUT_4)) {
       inputMessage = request->getParam(PARAM_INPUT_4)->value();
@@ -700,7 +745,7 @@ void startNormalWebServer() {
       wipeAllSettings();
       request->send(200, "text/html",
                     "All settings wiped. Restarting...");
-
+      request->redirect("/");
       restartRequested = true;
       return;
     }
@@ -763,20 +808,28 @@ void startWiFiManagerServer() {
     request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
   });
 
+  server.on("/wifimanager", HTTP_GET, [](AsyncWebServerRequest* request) {
+    request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
+  });
+
   server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/");
+    request->redirect("/wifimanager");
   });
 
   server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/");
+    request->redirect("/wifimanager");
   });
 
   server.on("/connecttest.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/");
+    request->redirect("/wifimanager");
   });
 
   server.on("/ncsi.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/");
+    request->redirect("/wifimanager");
+  });
+
+  server.on("/library/test/success.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/wifimanager");
   });
 
   server.onNotFound([](AsyncWebServerRequest *request) {
@@ -1001,6 +1054,7 @@ void setup() {
     gateway.fromString("192.168.1.1");
     gatewayIP = "192.168.1.1";
   }
+  primaryDNS = gateway;
   emailSenderAccount = readFile(SPIFFS, emailSenderPath);
   emailSenderPassword = readFile(SPIFFS, emailSenderPassPath);
   inputMessage = readFile(SPIFFS, inputMessagePath);
@@ -1087,7 +1141,7 @@ void setup() {
     Serial.println("First WiFi attempt failed.");
     Serial.println("Trying again in 2 seconds...");
 
-    WiFi.disconnect(true);
+    WiFi.disconnect(false);
     delay(2000);
 
 // Second Wi-Fi connection attempt
@@ -1097,6 +1151,8 @@ void setup() {
 
   if (wifiConnected) {
     Serial.println("WiFi connected.");
+    Serial.println("Waiting for network to settle...");
+    delay(4000);
     startNormalWebServer();
   } else {
     Serial.println("WiFi connection failed twice.");
@@ -1151,7 +1207,10 @@ void loop() {
       if (readTemperature()) {
         printLocalTime();
 
-        float temperature = sensors.getTempFByIndex(0);
+        float temperature = tempUnit == "C"
+                   ? temperatureC.toFloat()
+                   : temperatureF.toFloat();
+        const char* temperatureUnitLabel = tempUnit == "C" ? "C" : "F";
 
         if (influxEnabled == "true") {
           float influxTemperature;
@@ -1183,7 +1242,7 @@ void loop() {
         // been sent.
         if (temperature > threshold && inputMessage2 == "true" && !emailSent) {
           String emailMessage = String("Temperature above threshold. Current temperature: ") +
-                                String(temperature, 2) + " F";
+                                String(temperature, 2) + " " + temperatureUnitLabel;
 
           if (sendEmailNotification(emailMessage)) {
             Serial.println(emailMessage);
@@ -1197,7 +1256,7 @@ void loop() {
         else if (temperature < (threshold - 1.0f) &&
                  inputMessage2 == "true" && emailSent) {
           String emailMessage = String("Temperature below threshold. Current temperature: ") +
-                                String(temperature, 2) + " F";
+                                String(temperature, 2) + " " + temperatureUnitLabel;
 
           if (sendEmailNotification(emailMessage)) {
             Serial.println(emailMessage);
@@ -1211,16 +1270,34 @@ void loop() {
   }
 
   // If WiFi goes down, periodically try to reconnect.
+  if (WiFi.getMode() == WIFI_STA && WiFi.status() == WL_CONNECTED) {
+    if (!timeSyncStarted) {
+      startTimeSync();
+    }
+    wifiReconnectAttempts = 0;
+  }
   if (WiFi.getMode() == WIFI_STA &&
       WiFi.status() != WL_CONNECTED &&
       currentMillis - lastWiFiReconnect >= wifiReconnectInterval) {
 
     lastWiFiReconnect = currentMillis;
+    wifiReconnectAttempts++;
     Serial.println("Reconnecting to WiFi...");
+    Serial.print("WiFi reconnect attempt ");
+    Serial.print(wifiReconnectAttempts);
+    Serial.print(" of ");
+    Serial.println(maxWiFiReconnectAttempts);
 
-    WiFi.disconnect(true);
+    WiFi.disconnect(false);
+    timeSyncStarted = false;
     delay(100);
     WiFi.begin(ssid.c_str(), pass.c_str());
+
+    if (wifiReconnectAttempts >= maxWiFiReconnectAttempts) {
+      Serial.println("WiFi reconnect limit reached. Restarting into WiFi Manager...");
+      delay(500);
+      ESP.restart();
+    }
   }
   if (restartRequested) {
     delay(1500);
