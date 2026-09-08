@@ -56,7 +56,7 @@ Board settings in Arduino.
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
 
-***Then go to IP address 192.168.4.1 to setup your wifi credentials and the Email account that will send the alerts. If using gmail set a app password in gmail settings.***
+***Then the captive portal will pop up to setup your wifi credentials and the Email account that will send the alerts. Code is setup for gmail so set a app password in gmail settings.***
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/manager.PNG" width="200">
 
