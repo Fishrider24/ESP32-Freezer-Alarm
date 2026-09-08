@@ -14,7 +14,7 @@
     - DallasTemperature 4.x
     - OneWire 2.3.8
     - ReadyMail 0.4.x (replaces ESP-Mail-Client)
-    - InfluxDB Client for Arduino 3.13.2
+    - ESP8266 Influxdb 3.13.2
 
   The existing SPIFFS files and web pages are intentionally retained so
   existing configuration files can continue to be used.
