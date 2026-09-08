@@ -9,11 +9,13 @@ The original project was updated to work with newer versions of the ESP32 Arduin
 
     Updated ESP32 Arduino Environment
     The project was updated to work with:
-    Arduino IDE 2.3.x
-    ESP32 Arduino Core 3.x
-    Current ESP32Async libraries
-    Current DallasTemperature / OneWire libraries
-    ReadyMail for SMTP email
+    - ESP32 Arduino core 3.x
+    - ESP32Async ESPAsyncWebServer 3.12.0
+    - ESP32Async AsyncTCP 3.5.0
+    - DallasTemperature 4.x
+    - OneWire 2.3.8
+    - ReadyMail 0.4.x (replaces ESP-Mail-Client)
+    - ESP8266 Influxdb 3.13.2
     The original code relied on older ESP32/library APIs that are no longer compatible with the newer ESP32 Arduino Core.
     Added the ability to change settings without needing to upload project again.
     Now you can change Title, Gateway, IP, SSID, SSID Password, Email Sender, Email Sender Password and switch between Fahrenheit and Celsius.
@@ -35,18 +37,10 @@ Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data 
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
 
-Main library updates:
-    - ESP32 Arduino core 3.x
-    - ESP32Async ESPAsyncWebServer
-    - ESP32Async AsyncTCP
-    - DallasTemperature 4.x
-    - OneWire 2.3.8
-    - ReadyMail 0.4.x (replaces ESP-Mail-Client)
-    - ESP8266 Influxdb 3.13.2
 Old copies of ESPAsyncWebServer and AsyncTCP must not be installed alongside the new versions.
 Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause compilation errors or library conflicts.
 
-Smtp server as Gmail(lines 64,65) and gmtOffset(lines 56-58) for timezone are still hard coded.  Change as needed
+Smtp server as Gmail(lines 64,65) Change as needed.
 
 Board settings in Arduino.
 
