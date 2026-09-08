@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>ESP Wi-Fi Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -17,7 +18,7 @@
         <form action="/wifimanager" method="POST">
             <p style="line-height: .8;">
                 <label for="ssid">Freezer Name</label><br>
-                <input type="text" id="freezername" name="freezername" value="%FREEZER_NAME%"><br>
+                <input type="text" id="freezername" name="freezername" value="%FREEZER_NAME%" autofocus><br>
                 <label for="ssid">SSID</label><br>
                 <input type="text" id="ssid" name="ssid"><br>
                 <label for="pass">Password</label><br>
@@ -34,12 +35,12 @@
 
                 <label>
                     <input type="radio" name="temp_unit" value="F" %TEMP_UNIT_F%>
-                    Fahrenheit (°F)
+                    Fahrenheit (&deg;F)
                 </label>
 
                 <label>
                     <input type="radio" name="temp_unit" value="C" %TEMP_UNIT_C%>
-                    Celsius (°C)
+                    Celsius (&deg;C)
                 </label><br>
                 <label for="time_format">Time Format</label>
                 <select name="time_format" id="time_format">

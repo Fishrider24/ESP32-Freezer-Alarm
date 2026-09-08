@@ -1,41 +1,68 @@
-<!DOCTYPE HTML><html>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Freezer Alarm">
+<!DOCTYPE html>
+<html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="%FREEZER_NAME%">
+    <meta name="application-name" content="%FREEZER_NAME%">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0A1128">
+    <title>%FREEZER_NAME%</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <style>
     html {
-     font-family: Arial;
-     display: inline-block;
-     margin: 0px auto;
+     font-family: Arial, sans-serif;
+        display: inline-block;
+        margin: 0px auto;
      text-align: center;
     }
-    h2 { font-size: 3.0rem; }
+    body {
+     margin: 0;
+    }
+    h1 { font-size: 2.8rem; }
+    h2 { font-size: 1.8rem; }
     h3 { font-size: 1.2rem; }
-    p { font-size: 3.0rem; }
-    .units { font-size: 1.2rem; }
+    p { font-size: 2.5rem; }
+    .units { font-size: 1.5rem; }
     .ds-labels{
       font-size: 1.5rem;
       vertical-align:middle;
       padding-bottom: 15px;
     }
+        input, button {
+         font-size: 16px;
+        }
+                @media (prefers-color-scheme: dark) {
+                 html, body {
+                    background: #0d141b;
+                  color: #2E7D32;
+                 }
+                 input, button {
+                    background: #16222c;
+                  color: #2E7D32;
+                    border-color: #526777;
+                 }
+                 a {
+                  color: #72c47a;
+                 }
+                }
   </style>
 </head>
 <body>
-    <h2>%FREEZER_NAME%</h2>
+        <h1>%FREEZER_NAME%</h1>
     <p>
         <i class="fas fa-thermometer-half" style="color:#059e8a;"></i>
-        <span id="temperature">%TEMPERATUREF%</span>
+        <span id="temperature">%TEMPERATURE%</span>
         <sup class="units">&deg;<span id="tempunit">%TEMP_UNIT%</span></sup>
     </p>
   <h2>ESP Email Notification</h2>
   <form action="/get">
-    Email Address <input type="email" name="email_input" value="%EMAIL_INPUT%" required><br>
+    Email Address<br> <input type="email" name="email_input" value="%EMAIL_INPUT%" required><br>
     @vtext.com for Verizon, @txt.att.net for AT&T<br>
-    Secondary Email Address <input type="email" name="email_inputcc" value="%EMAIL_INPUTCC%"><br>
+    Secondary Email Address<br> <input type="email" name="email_inputcc" value="%EMAIL_INPUTCC%"><br>
     Enable Email Notification <input type="checkbox" name="enable_email_input" value="true" %ENABLE_EMAIL%><br>
-    Temperature Threshold <input type="number" step="0.1" name="threshold_input" value="%THRESHOLD%" required><br>
+    Temperature Threshold<br> <input type="number" step="0.1" name="threshold_input" value="%THRESHOLD%" required><br>
     <input type="submit" value="Submit">
   </form>
   <h3>Last received packet:<br><span id="timenow">%TIMESTAMP%<br/></span></h3>
@@ -44,7 +71,6 @@
           <button type="button">Setup</button>
       </a>
   </div>  
-</body>
 <script>
     function updateTemperature() {
         var xhttp = new XMLHttpRequest();
@@ -72,12 +98,27 @@
         xhttp.send();
     }
 
+    function checkEmailStatus() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200 &&
+                this.responseText !== "ok") {
+                alert("Email alert failed to send:\n\n" + this.responseText);
+            }
+        };
+        xhttp.open("GET", "/emailstatus", true);
+        xhttp.send();
+    }
+
     // Update immediately when the page loads
     updateTemperature();
     updateTime();
+    checkEmailStatus();
 
     // Continue updating every 10 seconds
     setInterval(updateTemperature, 10000);
     setInterval(updateTime, 10000);
+    setInterval(checkEmailStatus, 10000);
 </script>
+</body>
 </html>

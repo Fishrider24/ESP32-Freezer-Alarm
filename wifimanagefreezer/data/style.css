@@ -1,7 +1,12 @@
 html {
   font-family: Arial, Helvetica, sans-serif; 
-  display: inline-block; 
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 h1 {
@@ -20,18 +25,22 @@ p {
 
 body {  
   margin: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .content { 
+  width: 100%;
   padding: 5%;
 }
 
 .card-grid { 
+  width: 100%;
   max-width: 800px; 
   margin: 0 auto; 
   display: grid; 
   grid-gap: 2rem; 
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .card { 
@@ -64,8 +73,10 @@ input[type=submit]:hover {
   background-color: #1282A2;
 }
 
-input[type=text], input[type=number], select {
-  width: 50%;
+input[type=text], input[type=password], input[type=number], select {
+  width: min(50%, 280px);
+  max-width: calc(100% - 24px);
+  font-size: 16px;
   padding: 12px 20px;
   margin: 18px;
   display: inline-block;
@@ -106,4 +117,35 @@ button {
 }
 .button-off:hover {
   background-color: #252524;
-} 
+}
+
+@media (max-width: 600px) {
+  .content {
+    padding: 12px;
+  }
+
+  .card-grid {
+    grid-gap: 0;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+  }
+
+  input[type=text], input[type=password], input[type=number], select {
+    width: calc(100% - 24px);
+    margin: 10px 12px;
+  }
+
+  label {
+    font-size: 1rem;
+  }
+}
