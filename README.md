@@ -16,9 +16,11 @@ The original project was updated to work with newer versions of the ESP32 Arduin
     - OneWire 2.3.8
     - ReadyMail 0.4.x (replaces ESP-Mail-Client)
     - ESP8266 Influxdb 3.13.2
-    The original code relied on older ESP32/library APIs that are no longer compatible with the newer ESP32 Arduino Core.
+    The original code relied on older ESP32/library APIs that are no longer compatible 
+    with the newer ESP32 Arduino Core.
     Added the ability to change settings without needing to upload project again.
-    Now you can change Title, Gateway, IP, SSID, SSID Password, Email Sender, Email Sender Password and switch between Fahrenheit and Celsius.
+    Now you can change Title, Gateway, IP, SSID, SSID Password, Email Sender, Email Sender Password 
+    TimeZone using POSIX timezone string, 12/24hr, InfluxDB 1.8 and switch between Fahrenheit and Celsius.
     Only need to upload 3 files with spiffs. The .ino will create the rest.
     On my board I used GPIO 4 and the 3D print cutout is meant for that pin.
 To use, make sure all the libraries listed above are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
