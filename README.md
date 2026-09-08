@@ -42,6 +42,7 @@ Main library updates:
     - DallasTemperature 4.x
     - OneWire 2.3.8
     - ReadyMail 0.4.x (replaces ESP-Mail-Client)
+    - ESP8266 Influxdb 3.13.2
 Old copies of ESPAsyncWebServer and AsyncTCP must not be installed alongside the new versions.
 Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause compilation errors or library conflicts.
 
