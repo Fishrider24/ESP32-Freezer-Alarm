@@ -20,7 +20,8 @@ The original project was updated to work with newer versions of the ESP32 Arduin
     Added the ability to change settings without needing to upload project again.
     Now you can change Title, Gateway, IP, SSID, SSID Password, Email Sender, Email Sender Password and switch between Fahrenheit and Celsius.
     Only need to upload 3 files with spiffs. The .ino will create the rest.
-
+To use, make sure all the libraries listed above are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
+Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the two html files and one css file. 
 I made this alarm using several tutorials from https://randomnerdtutorials.com/ originally.
 It has a Wifi Manager, so you dont have to hard code the wifi data into it.
 Uses a DS18B20 waterproof sensor.
@@ -31,9 +32,6 @@ You will need to setup app passwords in gmail. https://support.google.com/mail/a
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
-
-To use, make sure all the libraries labeled below are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
-Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the two html files and one css file. 
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
 
