@@ -20,6 +20,7 @@ The original project was updated to work with newer versions of the ESP32 Arduin
     Added the ability to change settings without needing to upload project again.
     Now you can change Title, Gateway, IP, SSID, SSID Password, Email Sender, Email Sender Password and switch between Fahrenheit and Celsius.
     Only need to upload 3 files with spiffs. The .ino will create the rest.
+    On my board I used GPIO 4 and the 3D print cutout is meant for that pin.
 To use, make sure all the libraries listed above are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
 Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the two html files and one css file. 
 I made this alarm using several tutorials from https://randomnerdtutorials.com/ originally.
