@@ -32,10 +32,9 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 You will need to setup app passwords in gmail. https://support.google.com/mail/answer/185833?hl=en
-<div style="display: flex; gap: 50px;">
-  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">
-  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
-</div>
+
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
+
 <div style="display: flex; gap: 50px;">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/dark.PNG" width="200">
