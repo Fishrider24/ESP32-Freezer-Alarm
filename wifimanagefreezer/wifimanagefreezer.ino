@@ -32,6 +32,7 @@
 #include <ReadyMail.h>
 #include <InfluxDbClient.h>
 #include <DNSServer.h>
+#include <Update.h>
 
 // -----------------------------------------------------------------------------
 // Hardware
@@ -137,6 +138,8 @@ const char* PARAM_INFLUX_MEASUREMENT = "influx_measurement";
 const char* PARAM_TIME_FORMAT = "time_format";
 const char* PARAM_TIME_ZONE = "time_zone";
 const char* reboot = "reboot";
+const char* otaUsername = "admin";
+const char* otaPassword = "freezeralarm";  //<----- Change this to a secure password for OTA updates
 
 // -----------------------------------------------------------------------------
 // Wi-Fi configuration
@@ -379,6 +382,9 @@ String processor(const String& var) {
   }
   else if (var == "INFLUX_MEASUREMENT") {
     return influxMeasurement;
+  }
+  else if (var == "TIME_ZONE") {
+    return timeZone;
   }
   else if (var == "TIME_FORMAT_12") {
     return timeFormat == "12" ? "selected" : "";
@@ -681,6 +687,9 @@ void startNormalWebServer() {
     request->send(SPIFFS, "/index.html", "text/html", false, processor);
   });
   server.on("/wifimanager", HTTP_GET, [](AsyncWebServerRequest* request) {
+    if (!request->authenticate(otaUsername, otaPassword)) {
+      return request->requestAuthentication();
+    }
     request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
   });
 
@@ -741,6 +750,9 @@ void startNormalWebServer() {
     restartRequested = true;
   });
   server.on("/wifimanager", HTTP_POST, [](AsyncWebServerRequest* request) {
+    if (!request->authenticate(otaUsername, otaPassword)) {
+      return request->requestAuthentication();
+    }
     if (request->hasParam("wipeall", true)) {
       wipeAllSettings();
       request->send(200, "text/html",
@@ -782,6 +794,100 @@ void startNormalWebServer() {
       restartRequested = true;
     }
   });
+  // ---------------------------------------------------------------------------
+  // Firmware OTA update
+  // ---------------------------------------------------------------------------
+  server.on("/update", HTTP_POST,
+    [](AsyncWebServerRequest *request) {
+      if (!request->authenticate(otaUsername, otaPassword)) {
+        return request->requestAuthentication();
+      }
+      if (Update.hasError()) {
+        request->send(500, "text/plain", "OTA update failed.");
+      } else {
+        request->send(200, "text/plain", "OTA update successful. Restarting...");
+        delay(2000);
+        request->redirect("/");
+        restartRequested = true;
+      }
+    },
+    [](AsyncWebServerRequest *request, String filename, size_t index,
+       uint8_t *data, size_t len, bool final) {
+
+      if (index == 0) {
+        Serial.printf("OTA update started: %s\n", filename.c_str());
+
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+          Update.printError(Serial);
+        }
+      }
+
+      if (len) {
+        if (Update.write(data, len) != len) {
+          Update.printError(Serial);
+        }
+      }
+
+      if (final) {
+        if (Update.end(true)) {
+          Serial.printf("OTA update complete: %u bytes\n",
+                        (unsigned int)(index + len));
+        } else {
+          Update.printError(Serial);
+        }
+      }
+    }
+  );
+  // ---------------------------------------------------------------------------
+  // SPIFFS OTA update
+  // ---------------------------------------------------------------------------
+  server.on("/update-spiffs", HTTP_POST,
+    [](AsyncWebServerRequest *request) {
+      if (!request->authenticate(otaUsername, otaPassword)) {
+        return request->requestAuthentication();
+      }
+      if (Update.hasError()) {
+        request->send(500, "text/plain", "SPIFFS update failed.");
+      } else {
+        request->send(200, "text/html",
+                      "<html><head>"
+                      "<meta http-equiv='refresh' content='3;url=/'>"
+                      "</head><body>"
+                      "<h2>SPIFFS update successful!</h2>"
+                      "<p>Restarting...</p>"
+                      "</body></html>");
+        restartRequested = true;
+      }
+    },
+    [](AsyncWebServerRequest *request, String filename, size_t index,
+       uint8_t *data, size_t len, bool final) {
+
+      if (index == 0) {
+        Serial.printf("SPIFFS OTA update started: %s\n", filename.c_str());
+
+        SPIFFS.end();
+
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_SPIFFS)) {
+          Update.printError(Serial);
+        }
+      }
+
+      if (len) {
+        if (Update.write(data, len) != len) {
+          Update.printError(Serial);
+        }
+      }
+
+      if (final) {
+        if (Update.end(true)) {
+          Serial.printf("SPIFFS OTA update complete: %u bytes\n",
+                        (unsigned int)(index + len));
+        } else {
+          Update.printError(Serial);
+        }
+      }
+    }
+  );
   server.begin();
   Serial.println("Normal web server started.");
 }
@@ -794,11 +900,13 @@ void startWiFiManagerServer() {
   Serial.println("Setting up WiFi Manager access point.");
 
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("ESP-WIFI-MANAGER");
+  WiFi.softAP("ESP-WIFI-MANAGER", otaPassword);
+
 
   apModeStarted = millis();
   apWiFiCheckDone = false;
-
+  dnsServer.setTTL(0);
+  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
   dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
   Serial.print("AP IP address: ");
@@ -813,26 +921,45 @@ void startWiFiManagerServer() {
   });
 
   server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/wifimanager");
+    Serial.println("CAPTIVE: /generate_204");
+    request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
   });
 
   server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/wifimanager");
+    Serial.println("CAPTIVE: /hotspot-detect.html");
+    request->redirect("http://192.168.4.1/wifimanager");
+  });
+
+  server.on("/canonical.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("CAPTIVE: /canonical.html");
+    request->redirect("http://192.168.4.1/wifimanager");
+  });
+
+  server.on("/success.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("CAPTIVE: /success.txt");
+    request->redirect("http://192.168.4.1/wifimanager");
   });
 
   server.on("/connecttest.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/wifimanager");
+    Serial.println("CAPTIVE: /connecttest.txt");
+    request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
   });
 
   server.on("/ncsi.txt", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/wifimanager");
+    Serial.println("CAPTIVE: /ncsi.txt");
+    request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
   });
 
   server.on("/library/test/success.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/wifimanager");
+    Serial.println("CAPTIVE: /library/test/success.html");
+    request->send(SPIFFS, "/wifimanager.html", "text/html", false, processor);
   });
 
   server.onNotFound([](AsyncWebServerRequest *request) {
+    Serial.print("CAPTIVE REQUEST: ");
+    Serial.print(request->methodToString());
+    Serial.print(" ");
+    Serial.println(request->url());
     request->redirect("/wifimanager");
   });
 
@@ -1028,6 +1155,11 @@ void checkWiFiResetButton() {
 
 void setup() {
   Serial.begin(115200);
+  Serial.print("ESP32 Arduino core: ");
+  Serial.println(ESP.getSdkVersion());
+
+  Serial.print("ESP-IDF version: ");
+  Serial.println(ESP.getSdkVersion());
   delay(200);
   pinMode(BOOT_BUTTON_PIN, INPUT_PULLUP);
 
