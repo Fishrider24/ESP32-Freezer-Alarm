@@ -38,7 +38,7 @@ You will need to setup app passwords in gmail. https://support.google.com/mail/a
 </div>
 <div style="display: flex; gap: 10px;">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
-  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/darkmode.PNG" width="200">
+  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/dark.PNG" width="200">
 </div>
 Old copies of ESPAsyncWebServer and AsyncTCP must not be installed alongside the new versions.
 Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause compilation errors or library conflicts.
