@@ -45,10 +45,14 @@ Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause comp
 Smtp server as Gmail(lines 64,65) Change as needed.
 
 Board settings in Arduino.   ~~~***After first power-up, Connect to the ESP32 wifi***~~~
-<div style="display: flex; gap: 50px;">
-  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200" style="margin-right: 20px;">
-  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
-</div>
+<table>
+  <tr>
+    <td><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200"></td>
+    <td style="padding: 0 20px;"></td>
+    <td><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200"></td>
+  </tr>
+</table>
+
 ***Then the captive portal will pop up to setup your wifi credentials and the Email account that will send the alerts. Code is setup for gmail so set a app password in gmail settings. You can always change settings later from the broswer Setup button.***
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/manager.PNG" width="200">
