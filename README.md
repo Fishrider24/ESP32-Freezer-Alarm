@@ -33,25 +33,18 @@ Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 You will need to setup app passwords in gmail. https://support.google.com/mail/answer/185833?hl=en
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
 
-<div style="display: flex; gap: 50px;">
-  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
-  <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/dark.PNG" width="200">
-</div>
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/dark.PNG" width="200">
+
 Old copies of ESPAsyncWebServer and AsyncTCP must not be installed alongside the new versions.
 Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause compilation errors or library conflicts.
 
 Smtp server as Gmail(lines 64,65) Change as needed.
 
-Board settings in Arduino.&emsp;&emsp;   ~~~***After first power-up, Connect to the ESP32 wifi***~~~
-<table>
-  <tr>
-    <td><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200"></td>
-    <td style="padding: 0 120px;"></td>
-    <td><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200"></td>
-  </tr>
-</table>
+Board settings in Arduino.&emsp;&emsp;&emsp;&emsp;&emsp;~~~***After first power-up, Connect to the ESP32 wifi***~~~
+
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
 
 ***Then the captive portal will pop up to setup your wifi credentials and the Email account that will send the alerts. Code is setup for gmail so set a app password in gmail settings. You can always change settings later from the broswer Setup button.***
 
