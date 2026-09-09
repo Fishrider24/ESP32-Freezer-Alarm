@@ -94,7 +94,25 @@
                 </button><br>
                 <br><br>
             </p>
-        </div>
+        </form></div>
+        <hr>
+
+                <h2>Firmware OTA Update</h2>
+
+                <form action="/update" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="update" accept=".bin" required>
+                    <br><br>
+                    <button type="submit">Upload Firmware</button>
+                </form>
+        <hr>
+
+                <h2>SPIFFS OTA Update</h2>
+
+                <form action="/update-spiffs" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="update" accept=".bin" required>
+                    <br><br>
+                    <button type="submit">Upload SPIFFS</button>
+                </form>
     </div>
   </div>
 </body>
