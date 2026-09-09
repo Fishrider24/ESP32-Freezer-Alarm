@@ -48,7 +48,7 @@ Board settings in Arduino.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   ~~~***After first pow
 <table>
   <tr>
     <td><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200"></td>
-    <td style="padding: 0 60px;"></td>
+    <td style="padding: 0 120px;"></td>
     <td><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200"></td>
   </tr>
 </table>
