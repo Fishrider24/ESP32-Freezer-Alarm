@@ -44,7 +44,7 @@ Smtp server as Gmail(lines 64,65) Change as needed.
 
 Board settings in Arduino.&emsp;&emsp;&emsp;&emsp;&emsp;~~~***After first power-up, Connect to the ESP32 wifi***~~~
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
 
 ***Then the captive portal will pop up to setup your wifi credentials and the Email account that will send the alerts. Code is setup for gmail so set a app password in gmail settings. You can always change settings later from the broswer Setup button.***
 
@@ -58,4 +58,4 @@ Set an App Password on your Gmail account!!
 
 Made a remix of a case on Thingiverse. https://www.thingiverse.com/thing:5193607
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/magnet.jpeg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/pageip.jpg" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.jpg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/magnet.jpeg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/pageip.jpg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.jpg" width="200">
