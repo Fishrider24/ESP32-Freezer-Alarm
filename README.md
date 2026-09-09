@@ -32,11 +32,11 @@ Uses a DS18B20 waterproof sensor.
 Has a Wifi Reconnect function.
 Has an email alert if Sensortemp reading goes over setpoint, and alerts when it goes back down.
 You will need to setup app passwords in gmail. https://support.google.com/mail/answer/185833?hl=en
-<div style="display: flex; gap: 10px;">
+<div style="display: flex; gap: 50px;">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
 </div>
-<div style="display: flex; gap: 10px;">
+<div style="display: flex; gap: 50px;">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/webpage.png" width="200">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/dark.PNG" width="200">
 </div>
@@ -45,8 +45,8 @@ Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause comp
 
 Smtp server as Gmail(lines 64,65) Change as needed.
 
-Board settings in Arduino.   ***After first power-up, Connect to the ESP32 wifi*** 
-<div style="display: flex; gap: 10px;">
+Board settings in Arduino.   ~~~***After first power-up, Connect to the ESP32 wifi***~~~
+<div style="display: flex; gap: 50px;">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardsettings.png" width="200">
   <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifimanager.jpeg" width="200">
 </div>
