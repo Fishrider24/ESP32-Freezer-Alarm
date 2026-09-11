@@ -1,9 +1,9 @@
 # ESP32-Freezer-Alarm Version 2.4 (3d printed case at bottom)
-2.4-Added OTA updates for App and Spiffs, with this I had to set a custom Partition, added password protection to Setup link.  Created a custom partitions.csv to make room for OTA updates. Also password to ESP-WIFI-MANAGER AP, both Setup button password and AP password are passed on 'const char* otaPassword = "freezeralarm";' its a good idea to change.  Username for Setup is admin. Delays the captive portal on iphone 30 seconds though.. 
+2.4-Added OTA updates for App and Spiffs added password protection to Setup link.  Created a custom partitions.csv to make room for OTA updates. Also password to ESP-WIFI-MANAGER AP, both Setup button password and AP password are passed on 'const char* otaPassword = "freezeralarm";' its a good idea to change.  Username for Setup is admin. Delays the captive portal on iphone 30 seconds though.. 
 2.3-Added Dark Mode and fixed some ntp bugs and Celsius alarm by.
 Added a WipeAll Button to erase Wifi credentials, ip's, email sender information, and all influxdb settings.
 Added influxdb 1.8, 12/24hr and timezone settings. Also Wifi Captive Portal for initial setup. Also made the bootloader button default wifi settings after holding it for 5 seconds. Better restarts if wifi turns off.
-Make sure to set partition scheme: Partition Scheme: "No OTA (2MB APP/2MB SPIFFS)"
+Make sure to set partition scheme(Verson 2.3 or lower, use custom for 2.4): Partition Scheme: "No OTA (2MB APP/2MB SPIFFS)"
 ESP32 Temp Alarm using DS18B20, wifi manager, Email alert Threshold. 
 
 Changes From the Original Project
