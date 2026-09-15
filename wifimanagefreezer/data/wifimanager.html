@@ -8,10 +8,16 @@
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
   <div class="topnav">
-    <h1>ESP Wi-Fi Manager</h1>
+    <h1>%FREEZER_NAME% Alarm Settings</h1>
   </div>
+  <div>
+    <a href="/">
+        <button type="button">Home</button>
+    </a>
+  </div>  
   <div class="content">
     <div class="card-grid">
       <div class="card">
@@ -96,7 +102,6 @@
             </p>
         </form></div>
         <hr>
-
                 <h2>Firmware OTA Update</h2>
 
                 <form action="/update" method="POST" enctype="multipart/form-data">
@@ -106,12 +111,22 @@
                 </form>
         <hr>
 
-                <h2>SPIFFS OTA Update</h2>
+                <h2>SPIFFS File Update(Won't wipe other files)</h2>
+
+                <form action="/update-file" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="update" accept=".html" required>
+                    <br><br>
+                    <button type="submit">Upload  HTML File</button>
+                </form>
+
+        <hr>
+
+                <h2>Full SPIFFS Partition OTA(Will wipe all other files)</h2>
 
                 <form action="/update-spiffs" method="POST" enctype="multipart/form-data">
                     <input type="file" name="update" accept=".bin" required>
                     <br><br>
-                    <button type="submit">Upload SPIFFS</button>
+                    <button type="submit">Upload SPIFFS Partition</button>
                 </form>
     </div>
   </div>

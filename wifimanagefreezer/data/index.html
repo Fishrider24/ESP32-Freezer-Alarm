@@ -34,19 +34,29 @@
          font-size: 16px;
         }
                 @media (prefers-color-scheme: dark) {
-                 html, body {
-                    background: #0d141b;
-                  color: #2E7D32;
-                 }
-                 input, button {
-                    background: #16222c;
-                  color: #2E7D32;
-                    border-color: #526777;
-                 }
-                 a {
-                  color: #72c47a;
-                 }
+                    html, body {
+                        background: #0d141b;
+                        color: #2E7D32;
+                    }
+                    input, button {
+                        background: #16222c;
+                        color: #2E7D32;
+                        border-color: #526777;
+                    }
+                    a {
+                        color: #72c47a;
+                    }
                 }
+                 /* Keep Submit and Setup buttons the same in light and dark mode */
+                button, input[type="submit"] {
+                    background: #059e8a;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 8px 16px;
+                    cursor: pointer;
+                }
+
   </style>
 </head>
 <body>
@@ -62,7 +72,7 @@
     @vtext.com for Verizon, @txt.att.net for AT&T<br>
     Secondary Email Address<br> <input type="email" name="email_inputcc" value="%EMAIL_INPUTCC%"><br>
     Enable Email Notification <input type="checkbox" name="enable_email_input" value="true" %ENABLE_EMAIL%><br>
-    Temperature Threshold<br> <input type="number" step="0.1" name="threshold_input" value="%THRESHOLD%" required><br>
+    Temperature Threshold<br> <input type="number" style="width: 60px; padding-left: 50px; margin-left: 20px;" step="0.1" name="threshold_input" value="%THRESHOLD%" required><sup class="units">&deg;<span id="tempunit">%TEMP_UNIT%</span></sup><br><br>
     <input type="submit" value="Submit">
   </form>
   <h3>Last received packet:<br><span id="timenow">%TIMESTAMP%<br/></span></h3>
@@ -97,13 +107,18 @@
         xhttp.open("GET", "/timenow", true);
         xhttp.send();
     }
-
     function checkEmailStatus() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200 &&
-                this.responseText !== "ok") {
-                alert("Email alert failed to send:\n\n" + this.responseText);
+            if (this.readyState == 4 && this.status == 200) {
+                var response = this.responseText;
+                if (response.indexOf("sent:") === 0) {
+                    var reason = response.substring(5);
+                    alert("Email sent successfully!\n\nReason:\n" + reason);
+                } else if (response.indexOf("failed:") === 0) {
+                    var error = response.substring(7);
+                    alert("Email alert failed to send:\n\n" + error);
+                }
             }
         };
         xhttp.open("GET", "/emailstatus", true);
