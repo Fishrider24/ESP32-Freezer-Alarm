@@ -1,4 +1,5 @@
-# ESP32-Freezer-Alarm Version 2.4 (3d printed case at bottom)
+# ESP32-Freezer-Alarm Version 2.5 (3d printed case at bottom)
+2.5 Added Spiffs file upload, so if you just want to change index.html, other files don't get wiped. Cleaned up some html and added links after uploads/updates.
 2.4-Added OTA updates for App and Spiffs added password protection to Setup link.  Created a custom partitions.csv to make room for OTA updates. Also password to ESP-WIFI-MANAGER AP, both Setup button password and AP password are passed on 'const char* otaPassword = "freezeralarm";' its a good idea to change.  Username for Setup is admin. Delays the captive portal on iphone 30 seconds though.. 
 2.3-Added Dark Mode and fixed some ntp bugs and Celsius alarm by.
 Added a WipeAll Button to erase Wifi credentials, ip's, email sender information, and all influxdb settings.
