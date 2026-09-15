@@ -110,6 +110,12 @@ SMTPClient smtp(ssl_client);
 bool emailSent = false;
 bool emailFailurePending = false;
 String emailFailureMessage;
+bool emailSuccessPending = false;
+String emailSuccessMessage;
+bool spiFFSFileUploadSuccess = false;
+File spiFFSUploadFile;
+String spiFFSUploadPath;
+bool spiFFSUploadSuccess = false;
 
 // -----------------------------------------------------------------------------
 // Web server
@@ -550,6 +556,9 @@ bool sendEmailNotification(const String& emailMessage) {
 
   emailFailurePending = false;
   emailFailureMessage = "";
+  // Let the web page know an email was successfully sent and why.
+  emailSuccessMessage = emailMessage;
+  emailSuccessPending = true;
   Serial.println("ReadyMail: email sent successfully.");
   return true;
 }
@@ -708,12 +717,18 @@ void startNormalWebServer() {
   server.on("/emailstatus", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (emailFailurePending) {
       emailFailurePending = false;
-      request->send(200, "text/plain", emailFailureMessage);
-      emailFailureMessage = "";
+        String message = "sent:" + emailSuccessMessage;
+        emailSuccessMessage = "";
+        request->send(200, "text/plain", message);
+    } else if (emailFailurePending) {
+        emailFailurePending = false;
+        String message = "failed:" + emailFailureMessage;
+        emailFailureMessage = "";
+        request->send(200, "text/plain", message);
     } else {
-      request->send(200, "text/plain", "ok");
+        request->send(200, "text/plain", "ok");
     }
-  });
+});
 
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (request->hasParam(PARAM_INPUT_4)) {
@@ -805,9 +820,14 @@ void startNormalWebServer() {
       if (Update.hasError()) {
         request->send(500, "text/plain", "OTA update failed.");
       } else {
-        request->send(200, "text/plain", "OTA update successful. Restarting...");
-        delay(2000);
-        request->redirect("/");
+        request->send(200, "text/html",
+                      "<html><body>"
+                      "<h2>OTA update successful!</h2>"
+                      "<p>What would you like to do?</p>"
+                      "<p><a href='/'>Main Page</a></p>"
+                      "<p><a href='/wifimanager'>WiFi Manager</a></p>"
+                      "</body></html>");
+        //request->redirect("/");
         restartRequested = true;
       }
     },
@@ -850,12 +870,13 @@ void startNormalWebServer() {
         request->send(500, "text/plain", "SPIFFS update failed.");
       } else {
         request->send(200, "text/html",
-                      "<html><head>"
-                      "<meta http-equiv='refresh' content='3;url=/'>"
-                      "</head><body>"
-                      "<h2>SPIFFS update successful!</h2>"
-                      "<p>Restarting...</p>"
+                      "<html><body>"
+                      "<h2>OTA  Spiffs update successful!</h2>"
+                      "<p>What would you like to do?</p>"
+                      "<p><a href='/'>Main Page</a></p>"
+                      "<p><a href='/wifimanager'>WiFi Manager</a></p>"
                       "</body></html>");
+        //request->redirect("/");
         restartRequested = true;
       }
     },
@@ -884,6 +905,88 @@ void startNormalWebServer() {
                         (unsigned int)(index + len));
         } else {
           Update.printError(Serial);
+        }
+      }
+    }
+  );
+   // ---------------------------------------------------------------------------
+  // Individual SPIFFS file upload
+  // Replaces only the selected file. Does NOT erase the SPIFFS partition.
+  // ---------------------------------------------------------------------------
+  server.on("/update-file", HTTP_POST,
+    [](AsyncWebServerRequest *request) {
+      if (!request->authenticate(otaUsername, otaPassword)) {
+        return request->requestAuthentication();
+      }
+      if (spiFFSUploadSuccess) {
+        request->send(200, "text/html",
+                      "<html><body>"
+                      "<h2>File uploaded successfully!</h2>"
+                      "<p>What would you like to do?</p>"
+                      "<p><a href='/'>Main Page</a></p>"
+                      "<p><a href='/wifimanager'>WiFi Manager</a></p>"
+                      "</body></html>");
+      } else {
+        request->send(500, "text/plain",
+                      "File upload failed.");
+      }
+      spiFFSUploadSuccess = false;
+    },
+    [](AsyncWebServerRequest *request, String filename, size_t index,
+       uint8_t *data, size_t len, bool final) {
+    // Build the destination path
+      String path = "/" + filename;
+    // First chunk
+      if (index == 0) {
+        spiFFSUploadSuccess = false;
+        spiFFSUploadPath = path;
+        Serial.printf("Individual SPIFFS file upload started: %s\n",
+                      path.c_str());
+    // Remove any leftover temporary file
+        SPIFFS.remove("/upload.tmp");
+    // Open temporary file
+        spiFFSUploadFile = SPIFFS.open("/upload.tmp", FILE_WRITE);
+        if (!spiFFSUploadFile) {
+          Serial.println("Failed to open temporary SPIFFS file.");
+          return;
+        }
+      }
+    // Write incoming data
+      if (len && spiFFSUploadFile) {
+        size_t written = spiFFSUploadFile.write(data, len);
+        if (written != len) {
+          Serial.printf("SPIFFS write failed: %u of %u bytes written\n",
+                        (unsigned int)written,
+                        (unsigned int)len);
+          spiFFSUploadFile.close();
+          SPIFFS.remove("/upload.tmp");
+          return;
+        }
+      }
+  // Last chunk
+      if (final) {
+        if (!spiFFSUploadFile) {
+          Serial.println("SPIFFS upload file is not open.");
+          return;
+        }
+        spiFFSUploadFile.close();
+  // Remove the old file only after the new file was completely written
+        SPIFFS.remove(spiFFSUploadPath);
+  // Rename temporary file to the requested filename
+        if (SPIFFS.rename("/upload.tmp", spiFFSUploadPath)) {
+          spiFFSUploadSuccess = true;
+          Serial.printf(
+            "Individual SPIFFS file upload complete: %s (%u bytes)\n",
+            spiFFSUploadPath.c_str(),
+            (unsigned int)(index + len)
+          );
+        } else {
+          spiFFSUploadSuccess = false;
+          Serial.printf(
+            "Failed to rename temporary file to: %s\n",
+            spiFFSUploadPath.c_str()
+          );
+          SPIFFS.remove("/upload.tmp");
         }
       }
     }
@@ -1432,7 +1535,7 @@ void loop() {
     }
   }
   if (restartRequested) {
-    delay(1500);
+    delay(3000);
     ESP.restart();
   }
   // Keep the loop responsive.
