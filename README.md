@@ -50,7 +50,7 @@ Board settings in Arduino.&emsp;&emsp;&emsp;&emsp;&emsp;~~~***After first power-
 
 ***Then the captive portal will pop up to setup your wifi credentials and the Email account that will send the alerts. Code is setup for gmail so set a app password in gmail settings. You can always change settings later from the broswer Setup button.***
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9691.png" width="200"><img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9692.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9691.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9692.png" width="200">
 
 ***Then the System will Reboot and go to the ip address that you set or defaulted 192.168.1.200***  ***!!Make sure to reconnect to your WiFi!! Type in the IP address in your browser
 
