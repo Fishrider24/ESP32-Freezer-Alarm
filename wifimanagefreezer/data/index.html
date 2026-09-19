@@ -69,7 +69,7 @@
   <h2>ESP Email Notification</h2>
   <form action="/get">
     Email Address<br> <input type="email" name="email_input" value="%EMAIL_INPUT%" required><br>
-    @vtext.com for Verizon, @txt.att.net for AT&T<br>
+    @vtext.com for Verizon<br>
     Secondary Email Address<br> <input type="email" name="email_inputcc" value="%EMAIL_INPUTCC%"><br>
     Enable Email Notification <input type="checkbox" name="enable_email_input" value="true" %ENABLE_EMAIL%><br>
     Temperature Threshold<br> <input type="number" style="width: 60px; padding-left: 50px; margin-left: 20px;" step="0.1" name="threshold_input" value="%THRESHOLD%" required><sup class="units">&deg;<span id="tempunit">%TEMP_UNIT%</span></sup><br><br>
@@ -111,13 +111,35 @@
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
-                var response = this.responseText;
-                if (response.indexOf("sent:") === 0) {
-                    var reason = response.substring(5);
-                    alert("Email sent successfully!\n\nReason:\n" + reason);
-                } else if (response.indexOf("failed:") === 0) {
-                    var error = response.substring(7);
-                    alert("Email alert failed to send:\n\n" + error);
+                try {
+                    var data = JSON.parse(this.responseText);
+                    if (data.count > 0) {
+                        var notificationText = "";
+                        for (var i = 0; i < data.notifications.length; i++) {
+                            var notification = data.notifications[i];
+                            if (notification.status === "sent") {
+                                notificationText +=
+                                    "✓ Email sent successfully\n" +
+                                    notification.timestamp + "\n" +
+                                    notification.message;
+                            } else {
+                                notificationText +=
+                                    "⚠ Email failed to send\n" +
+                                    notification.timestamp + "\n" +
+                                    notification.message;
+                            }
+                            if (i < data.notifications.length - 1) {
+                                notificationText += "\n\n--------------------\n\n";
+                            }
+                        }
+                        alert(notificationText);
+                    // Acknowledge all notifications after they have been shown.
+                        var ack = new XMLHttpRequest();
+                        ack.open("GET", "/emailack", true);
+                        ack.send();
+                    }
+                } catch (e) {
+                    console.log("Error reading email status:", e);
                 }
             }
         };

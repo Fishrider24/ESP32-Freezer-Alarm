@@ -7,6 +7,65 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="style.css">
+<style>
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    .card {
+      background-color: #1e1e1e;
+      color: #ffffff;
+    }
+    input[type="text"],
+    input[type="password"],
+    select {
+      background-color: #2b2b2b;
+      color: #ffffff;
+      border: 1px solid #555;
+    }
+    input::placeholder {
+      color: #aaaaaa;
+    }
+    small {
+      color: #cccccc;
+    }
+    hr {
+      border-color: #444;
+    }
+  }
+  /* Center WiFi Manager content */
+  .content {
+    text-align: center;
+  }
+  /* Center title and Home button */
+  .topnav {
+    text-align: center;
+  }
+
+  body > div {
+    text-align: center;
+  }
+  .card {
+    text-align: center;
+  }
+  .card input[type="text"],
+  .card input[type="password"],
+  .card select {
+    text-align: center;
+  }
+  /* Rounded buttons - stay light in dark mode */
+  button,
+  input[type="submit"] {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+</style>
 </head>
 
 <body>
@@ -34,6 +93,8 @@
                 <label for="ip">Gateway Address</label><br>
                 <input type="text" id="gateway" name="gateway" value="%GATEWAY_ADDRESS%"><br>
                 <label for="emailSender">Email Sender Address</label><br>
+                <small>Note: If using Gmail, you may need to enable "Less secure app access" in your Google account settings.</small><br>
+                <small>Also, don't use your personal email, use a dedicated one.</small><br>
                 <input type="text" id="emailSender" name="emailSender"><br>
                 <label for="emailSenderPass">Email Sender Password</label><br>
                 <input type="password" id="emailSenderPass" name="emailSenderPass"><br>
@@ -64,7 +125,8 @@
                 <small>
                     Examples:<br>
                     Central: CST6CDT,M3.2.0,M11.1.0<br>
-                    London: GMT0BST,M3.5.0/1,M10.5.0/2
+                    London: GMT0BST,M3.5.0/1,M10.5.0/2<br>
+                    Check <a href="https://github.com/nayarsystems/posix_tz_db" target="_blank">NayarSystems</a> zones.csv more time zones.   
                 </small>
                 <br><br>
                 <input type="submit" value="Submit"><br><br>
