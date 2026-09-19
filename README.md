@@ -29,7 +29,7 @@ The original project was updated to work with newer versions of the ESP32 Arduin
     Only need to upload 3 files with spiffs. The .ino will create the rest.
     On my board I used GPIO 4 and the 3D print cutout is meant for that pin.
 
-~~Notes!!~~
+~~~***Notes!!***~~~
 AT&T doesn't do email to text anymore and Verizon is expected to go away from it. 
 My work around for AT&T is to add the sender email as a VIP email on my iPhone. Then allow 
 popup notifications for VIP's. Then I set the phone to check email every 30 minutes. 
