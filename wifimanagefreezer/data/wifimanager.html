@@ -151,9 +151,15 @@
 
                 <label>InfluxDB Password</label><br>
                 <input type="password" name="influx_password" value="%INFLUX_PASSWORD%"><br>
-
+        
                 <label>InfluxDB Measurement Name</label><br>
                 <input type="text" name="influx_measurement" value="%INFLUX_MEASUREMENT%" placeholder="freezertemp"><br>
+        <hr>
+                <h2>Wipe All Settings</h2>
+                <small>Warning: This will erase ALL saved settings and restart the ESP32.</small><br>
+                <small>Use this if you want to reset the ESP32 to factory settings.</small><br>
+                <small>After wiping, you will need to reconnect to the ESP32's WiFi and reconfigure it.</small><br>
+                <br>
                 <button type="submit"
                         name="wipeall"
                         value="true"
