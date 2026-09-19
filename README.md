@@ -1,4 +1,7 @@
-# ESP32-Freezer-Alarm Version 2.5 (3d printed case at bottom)
+# ESP32-Freezer-Alarm Version 2.6 (3d printed case at bottom)
+
+2.6 Added persistent notification.  On the main page any email fails or sent emails will be a popup and they will always show the last ten, with timestamps, until you press OK.  This way if there are any problems with your email setup, you will be able to know. Also removed txt.att.com, due to it no longer working.  Added comments on Readme on my work around on iPhone.  Added Dark Mode to the wifimanager screen, a link for finding your timezone and notes on Email Sender use.
+
 2.5 Added Spiffs file upload, so if you just want to change index.html, other files don't get wiped. Cleaned up some html and added links after uploads/updates.
 
 2.4-Added OTA updates for App and Spiffs added password protection to Setup link.  Created a custom partitions.csv to make room for OTA updates. Also password to ESP-WIFI-MANAGER AP, both Setup button password and AP password are passed on 'const char* otaPassword = "freezeralarm";' its a good idea to change.  Username for Setup is admin. Delays the captive portal on iphone 30 seconds though..
