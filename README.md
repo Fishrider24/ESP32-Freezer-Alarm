@@ -30,8 +30,9 @@ The original project was updated to work with newer versions of the ESP32 Arduin
     On my board I used GPIO 4 and the 3D print cutout is meant for that pin.
 
 *****~~~~NOTES~~~~*****
+
 AT&T doesn't do email to text anymore and Verizon is expected to go away from it. 
-My work around for AT&T is to add the sender email as a VIP email on my iPhone. Then allow 
+My work around for AT&T is to add the sender email as a VIP email on iPhone mail app. Then allow 
 popup notifications for VIP's. Then I set the phone to check email every 30 minutes. 
 
 To use, make sure all the libraries listed above are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
