@@ -49,7 +49,7 @@ You will need to setup app passwords in gmail. https://support.google.com/mail/a
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/board.jpeg" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/boardback.jpeg" width="200">
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9689.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9688.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9689.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/home_dark.PNG" width="200">
 
 Old copies of ESPAsyncWebServer and AsyncTCP must not be installed alongside the new versions.
 Having multiple copies of AsyncTCP or ESPAsyncWebServer installed can cause compilation errors or library conflicts.
@@ -62,11 +62,11 @@ Board settings in Arduino.&emsp;&emsp;&emsp;&emsp;&emsp;~~~***After first power-
 
 ***Then the captive portal will pop up to setup your wifi credentials and the Email account that will send the alerts. Code is setup for gmail so set a app password in gmail settings. You can always change settings later from the broswer Setup button.***
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9691.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9692.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/manage_dark.PNG" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/influx_dark.PNG" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/ota_dark.PNG" width="200">
 
 ***Then the System will Reboot and go to the ip address that you set or defaulted 192.168.1.200***  ***!!Make sure to reconnect to your WiFi!! Type in the IP address in your browser
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/restart.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/IMG_9688.png" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/restart.png" width="200">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/home_dark.PNG" width="200">
 
 Set an App Password on your Gmail account!!
 
