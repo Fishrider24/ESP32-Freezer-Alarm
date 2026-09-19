@@ -38,6 +38,8 @@ AT&T doesn't do email to text anymore and Verizon is expected to go away from it
 My work around for AT&T is to add the sender email as a VIP email on iPhone mail app. Then allow 
 popup notifications for VIP's. Then I set the phone to check email every 30 minutes. 
 
+I recommend Visual Studio Code with PlatformIO, its much easier and seems faster that using Arduino IDE. Random Nerd Tutorials is amazing! https://randomnerdtutorials.com/vs-code-platformio-ide-esp32-esp8266-arduino/
+
 To use, make sure all the libraries listed above are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
 Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the two html files and one css file. 
 I made this alarm using several tutorials from https://randomnerdtutorials.com/ originally.
