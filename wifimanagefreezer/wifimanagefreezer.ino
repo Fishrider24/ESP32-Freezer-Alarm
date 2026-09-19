@@ -108,10 +108,22 @@ SMTPClient smtp(ssl_client);
 
 // ReadyMail status callback reports SMTP progress and server responses.
 bool emailSent = false;
-bool emailFailurePending = false;
-String emailFailureMessage;
-bool emailSuccessPending = false;
-String emailSuccessMessage;
+// Email notification queue
+// ---------------------------------------------------------------------------
+struct EmailNotification {
+  String timestamp;
+  String status;
+  String message;
+};
+
+const int MAX_EMAIL_NOTIFICATIONS = 10;
+
+EmailNotification emailNotifications[MAX_EMAIL_NOTIFICATIONS];
+int emailNotificationCount = 0;
+//bool emailFailurePending = false;
+//String emailFailureMessage;
+//bool emailSuccessPending = false;
+//String emailSuccessMessage;
 bool spiFFSFileUploadSuccess = false;
 File spiFFSUploadFile;
 String spiFFSUploadPath;
@@ -470,22 +482,19 @@ void smtpCallback(SMTPStatus status) {
 bool sendEmailNotification(const String& emailMessage) {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("Cannot send email: WiFi is not connected.");
-    emailFailureMessage = "Wi-Fi is not connected.";
-    emailFailurePending = true;
+    addEmailNotification("failed", "Wi-Fi is not connected.");
     return false;
   }
 
   if (emailSenderAccount.length() == 0 || emailSenderPassword.length() == 0) {
     Serial.println("Cannot send email: sender account/password not configured.");
-    emailFailureMessage = "Sender email or password is not configured.";
-    emailFailurePending = true;
+    addEmailNotification("failed", "Sender email or password is not configured.");
     return false;
   }
 
   if (inputMessage.length() == 0) {
     Serial.println("Cannot send email: recipient is not configured.");
-    emailFailureMessage = "Recipient email address is not configured.";
-    emailFailurePending = true;
+    addEmailNotification("failed", "Recipient email address is not configured.");
     return false;
   }
 
@@ -498,8 +507,7 @@ bool sendEmailNotification(const String& emailMessage) {
 
   if (!smtp.isConnected()) {
     Serial.println("ReadyMail: SMTP connection failed.");
-    emailFailureMessage = "Could not connect to the Gmail SMTP server.";
-    emailFailurePending = true;
+    addEmailNotification("failed", "Could not connect to the Gmail SMTP server.");
     return false;
   }
 
@@ -511,8 +519,7 @@ bool sendEmailNotification(const String& emailMessage) {
 
   if (!smtp.isAuthenticated()) {
     Serial.println("ReadyMail: SMTP authentication failed.");
-    emailFailureMessage = "Gmail SMTP authentication failed. Check the sender email and app password.";
-    emailFailurePending = true;
+    addEmailNotification("failed", "Gmail SMTP authentication failed. Check the sender email and app password.");
     return false;
   }
 
@@ -549,16 +556,12 @@ bool sendEmailNotification(const String& emailMessage) {
   Serial.println("Sending email...");
   if (!smtp.send(message)) {
     Serial.println("ReadyMail: email send failed.");
-    emailFailureMessage = "The SMTP server did not accept the email.";
-    emailFailurePending = true;
+    addEmailNotification("failed", "The SMTP server did not accept the email.");
     return false;
   }
 
-  emailFailurePending = false;
-  emailFailureMessage = "";
   // Let the web page know an email was successfully sent and why.
-  emailSuccessMessage = emailMessage;
-  emailSuccessPending = true;
+  addEmailNotification("sent", emailMessage);
   Serial.println("ReadyMail: email sent successfully.");
   return true;
 }
@@ -715,20 +718,28 @@ void startNormalWebServer() {
   });
 
   server.on("/emailstatus", HTTP_GET, [](AsyncWebServerRequest* request) {
-    if (emailFailurePending) {
-      emailFailurePending = false;
-        String message = "sent:" + emailSuccessMessage;
-        emailSuccessMessage = "";
-        request->send(200, "text/plain", message);
-    } else if (emailFailurePending) {
-        emailFailurePending = false;
-        String message = "failed:" + emailFailureMessage;
-        emailFailureMessage = "";
-        request->send(200, "text/plain", message);
-    } else {
-        request->send(200, "text/plain", "ok");
+    String json = "{";
+    json += "\"count\":" + String(emailNotificationCount) + ",";
+    json += "\"notifications\":[";
+    for (int i = 0; i < emailNotificationCount; i++) {
+      if (i > 0) {
+        json += ",";
+      }
+      json += "{";
+      json += "\"timestamp\":\"" + emailNotifications[i].timestamp + "\",";
+      json += "\"status\":\"" + emailNotifications[i].status + "\",";
+      json += "\"message\":\"" + emailNotifications[i].message + "\"";
+      json += "}";
     }
-});
+    json += "]}";
+    request->send(200, "application/json", json);
+  });
+
+  server.on("/emailack", HTTP_GET, [](AsyncWebServerRequest* request) {
+    emailNotificationCount = 0;
+    Serial.println("Email notifications acknowledged and cleared.");
+    request->send(200, "text/plain", "ok");
+  });
 
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest* request) {
     if (request->hasParam(PARAM_INPUT_4)) {
@@ -1210,6 +1221,7 @@ void wipeAllSettings() {
 
   Serial.println("All settings wiped except temperature unit and time zone.");
 }
+
 // -----------------------------------------------------------------------------
 // BOOT button Wi-Fi reset
 // -----------------------------------------------------------------------------
@@ -1250,6 +1262,29 @@ void checkWiFiResetButton() {
   else {
     bootButtonPressedAt = 0;
   }
+}
+
+// -----------------------------------------------------------------------------
+// Email Notification Queue
+// -----------------------------------------------------------------------------
+
+void addEmailNotification(const String& status, const String& message) {
+  // If the queue is full, remove the oldest notification.
+  if (emailNotificationCount >= MAX_EMAIL_NOTIFICATIONS) {
+    for (int i = 1; i < MAX_EMAIL_NOTIFICATIONS; i++) {
+      emailNotifications[i - 1] = emailNotifications[i];
+    }
+
+    emailNotificationCount = MAX_EMAIL_NOTIFICATIONS - 1;
+  }
+  emailNotifications[emailNotificationCount].timestamp = timenow;
+  emailNotifications[emailNotificationCount].status = status;
+  emailNotifications[emailNotificationCount].message = message;
+  emailNotificationCount++;
+  Serial.printf("Email notification added: %s - %s - %s\n",
+                timenow.c_str(),
+                status.c_str(),
+                message.c_str());
 }
 
 // -----------------------------------------------------------------------------
