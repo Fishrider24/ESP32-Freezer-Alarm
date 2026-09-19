@@ -1,10 +1,12 @@
 # ESP32-Freezer-Alarm Version 2.5 (3d printed case at bottom)
 2.5 Added Spiffs file upload, so if you just want to change index.html, other files don't get wiped. Cleaned up some html and added links after uploads/updates.
-2.4-Added OTA updates for App and Spiffs added password protection to Setup link.  Created a custom partitions.csv to make room for OTA updates. Also password to ESP-WIFI-MANAGER AP, both Setup button password and AP password are passed on 'const char* otaPassword = "freezeralarm";' its a good idea to change.  Username for Setup is admin. Delays the captive portal on iphone 30 seconds though.. 
+
+2.4-Added OTA updates for App and Spiffs added password protection to Setup link.  Created a custom partitions.csv to make room for OTA updates. Also password to ESP-WIFI-MANAGER AP, both Setup button password and AP password are passed on 'const char* otaPassword = "freezeralarm";' its a good idea to change.  Username for Setup is admin. Delays the captive portal on iphone 30 seconds though..
+ 
 2.3-Added Dark Mode and fixed some ntp bugs and Celsius alarm by.
 Added a WipeAll Button to erase Wifi credentials, ip's, email sender information, and all influxdb settings.
 Added influxdb 1.8, 12/24hr and timezone settings. Also Wifi Captive Portal for initial setup. Also made the bootloader button default wifi settings after holding it for 5 seconds. Better restarts if wifi turns off.
-Make sure to set partition scheme(Verson 2.3 or lower, use custom for 2.4): Partition Scheme: "No OTA (2MB APP/2MB SPIFFS)"
+Make sure to set partition scheme(Verson 2.3 or lower, use custom for 2.4 and above): Partition Scheme: "No OTA (2MB APP/2MB SPIFFS)"
 ESP32 Temp Alarm using DS18B20, wifi manager, Email alert Threshold. 
 
 Changes From the Original Project
@@ -26,6 +28,12 @@ The original project was updated to work with newer versions of the ESP32 Arduin
     TimeZone using POSIX timezone string, 12/24hr, InfluxDB 1.8 and switch between Fahrenheit and Celsius.
     Only need to upload 3 files with spiffs. The .ino will create the rest.
     On my board I used GPIO 4 and the 3D print cutout is meant for that pin.
+
+~~Notes!!~~
+AT&T doesn't do email to text anymore and Verizon is expected to go away from it. 
+My work around for AT&T is to add the sender email as a VIP email on my iPhone. Then allow 
+popup notifications for VIP's. Then I set the phone to check email every 30 minutes. 
+
 To use, make sure all the libraries listed above are installed in your Arduino IDE. Put the wifimanagefreezer folder into your Arduino home folder.
 Wifimanagefreezer should have the wifimanagefreezer.ino file in it and the data folder. The data folder should have the two html files and one css file. 
 I made this alarm using several tutorials from https://randomnerdtutorials.com/ originally.
