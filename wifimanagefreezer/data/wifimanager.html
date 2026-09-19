@@ -84,20 +84,27 @@
             <p style="line-height: .8;">
                 <label for="ssid">Freezer Name</label><br>
                 <input type="text" id="freezername" name="freezername" value="%FREEZER_NAME%" autofocus><br>
+                <br>
                 <label for="ssid">SSID</label><br>
                 <input type="text" id="ssid" name="ssid"><br>
+                <br>
                 <label for="pass">Password</label><br>
                 <input type="password" id="pass" name="pass"><br>
+                <br>
                 <label for="ip">IP Address</label><br>
                 <input type="text" id="ip" name="ip" value="%IP_ADDRESS%"><br>
+                <br>
                 <label for="ip">Gateway Address</label><br>
                 <input type="text" id="gateway" name="gateway" value="%GATEWAY_ADDRESS%"><br>
+                <br>
                 <label for="emailSender">Email Sender Address</label><br>
                 <small>Note: If using Gmail, you may need to enable "Less secure app access" in your Google account settings.</small><br>
                 <small>Also, don't use your personal email, use a dedicated one.</small><br>
                 <input type="text" id="emailSender" name="emailSender"><br>
+                <br>
                 <label for="emailSenderPass">Email Sender Password</label><br>
                 <input type="password" id="emailSenderPass" name="emailSenderPass"><br>
+                <br>
                 <label>Temperature Unit</label><br>
 
                 <label>
@@ -109,12 +116,14 @@
                     <input type="radio" name="temp_unit" value="C" %TEMP_UNIT_C%>
                     Celsius (&deg;C)
                 </label><br>
+                <br>
                 <label for="time_format">Time Format</label>
                 <select name="time_format" id="time_format">
                     <br>
                     <option value="12" %TIME_FORMAT_12%>12-hour</option>
                     <option value="24" %TIME_FORMAT_24%>24-hour</option>
                 </select><br>
+                <br>
                 <label for="time_zone">Time Zone</label><br>
                 <input type="text"
                        name="time_zone"
@@ -136,39 +145,39 @@
                     <input type="checkbox" name="influx_enabled" value="true" %INFLUX_ENABLED%>
                     Enable InfluxDB
                 </label><br>
-
+                <br>
                 <label>InfluxDB Server IP</label><br>
                 <input type="text" name="influx_server" value="%INFLUX_SERVER%" placeholder="192.168.1.50"><br>
-
+                <br>
                 <label>InfluxDB Port</label><br>
                 <input type="text" name="influx_port" value="%INFLUX_PORT%" placeholder="8086"><br>
-
+                <br>
                 <label>InfluxDB Database</label><br>
                 <input type="text" name="influx_database" value="%INFLUX_DATABASE%" placeholder="freezer"><br>
-
+                <br>
                 <label>InfluxDB Username</label><br>
                 <input type="text" name="influx_username" value="%INFLUX_USERNAME%"><br>
-
+                <br>
                 <label>InfluxDB Password</label><br>
                 <input type="password" name="influx_password" value="%INFLUX_PASSWORD%"><br>
-        
+                <br>
                 <label>InfluxDB Measurement Name</label><br>
                 <input type="text" name="influx_measurement" value="%INFLUX_MEASUREMENT%" placeholder="freezertemp"><br>
+            </p>
+        </form></div>
         <hr>
+        <div>
                 <h2>Wipe All Settings</h2>
                 <small>Warning: This will erase ALL saved settings and restart the ESP32.</small><br>
                 <small>Use this if you want to reset the ESP32 to factory settings.</small><br>
                 <small>After wiping, you will need to reconnect to the ESP32's WiFi and reconfigure it.</small><br>
-                <br>
                 <button type="submit"
                         name="wipeall"
                         value="true"
                         onclick="return confirm('WARNING: This will erase ALL saved settings and restart the ESP32. Are you sure?');">
                     Wipe All Settings
                 </button><br>
-                <br><br>
-            </p>
-        </form></div>
+        </div>
         <hr>
                 <h2>Firmware OTA Update</h2>
 

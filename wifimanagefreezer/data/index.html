@@ -70,8 +70,11 @@
   <form action="/get">
     Email Address<br> <input type="email" name="email_input" value="%EMAIL_INPUT%" required><br>
     @vtext.com for Verizon<br>
+    <br>
     Secondary Email Address<br> <input type="email" name="email_inputcc" value="%EMAIL_INPUTCC%"><br>
+    <br>
     Enable Email Notification <input type="checkbox" name="enable_email_input" value="true" %ENABLE_EMAIL%><br>
+    <br>
     Temperature Threshold<br> <input type="number" style="width: 60px; padding-left: 50px; margin-left: 20px;" step="0.1" name="threshold_input" value="%THRESHOLD%" required><sup class="units">&deg;<span id="tempunit">%TEMP_UNIT%</span></sup><br><br>
     <input type="submit" value="Submit">
   </form>
