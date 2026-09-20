@@ -78,19 +78,26 @@ Made a remix of a case on Thingiverse. https://www.thingiverse.com/thing:5193607
 
 ## Credits
 
-This project was originally based on code and concepts from
-Random Nerd Tutorials.
+This project was originally based on code and projects by
+Rui Santos / Random Nerd Tutorials.
 
-Original source:
-https://randomnerdtutorials.com/
+The original sources included:
 
-The original project has been substantially modified for use as an
-ESP32 freezer temperature alarm, including the web interface,
-WiFi Manager configuration, email notifications, OTA updates,
-SPIFFS management, temperature-unit selection, and other
-project-specific functionality.
+- ESP32 Wi-Fi Manager / AsyncWebServer
+- ESP32 Filesystem Uploader
+- ESP32 DS18B20 Temperature
+- ESP32 Wi-Fi Reconnection
+- ESP32 Email Alert Temperature Threshold
 
-Original attribution and applicable license terms are retained
-for code derived from the original project.
+The original code has been substantially modified and expanded
+for use as an ESP32 freezer temperature alarm.
 
-Modifications by Evan Potts.
+Modifications and additional code by Evan Potts.
+
+Original sources:
+
+https://RandomNerdTutorials.com/esp32-wi-fi-manager-asyncwebserver/
+https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/
+https://randomnerdtutorials.com/esp32-ds18b20-temperature-arduino-ide/
+https://RandomNerdTutorials.com/solved-reconnect-esp32-to-wifi/
+https://RandomNerdTutorials.com/esp32-email-alert-temperature-threshold/
