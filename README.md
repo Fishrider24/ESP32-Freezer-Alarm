@@ -76,10 +76,19 @@ Made a remix of a case on Thingiverse. https://www.thingiverse.com/thing:5193607
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/magnet.jpeg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/pageip.jpg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.jpg" width="200">
 
-## Credits
+## License
 
-This project was originally based on code and projects by
-Rui Santos / Random Nerd Tutorials.
+Original Freezer Alarm code and modifications by Evan Potts
+are released under the MIT License.
+
+This project also contains code derived from third-party examples.
+Those portions remain subject to their applicable original
+attribution and license terms.
+
+### Random Nerd Tutorials
+
+Portions of this project were originally based on examples by
+Rui Santos / Sara Santos of Random Nerd Tutorials.
 
 The original sources included:
 
@@ -92,7 +101,8 @@ The original sources included:
 The original code has been substantially modified and expanded
 for use as an ESP32 freezer temperature alarm.
 
-Modifications and additional code by Evan Potts.
+The original attribution and permission notices are retained for
+code derived from these examples.
 
 Original sources:
 
