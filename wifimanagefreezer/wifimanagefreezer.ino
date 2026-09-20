@@ -1,7 +1,7 @@
 /*
   ESP32 Freezer Alarm - updated for current ESP32 Arduino libraries
   
-  Originally based on projects and code by Rui Santos / Random Nerd Tutorials.
+  Originally based on projects and code by Rui Santos / Sara Santos Random Nerd Tutorials.
   Original sources:
   ESP32 Wi-Fi Manager / AsyncWebServer:
   https://RandomNerdTutorials.com/esp32-wi-fi-manager-asyncwebserver/
@@ -13,9 +13,9 @@
   https://RandomNerdTutorials.com/solved-reconnect-esp32-to-wifi/
   ESP32 Email Alert Temperature Threshold:
   https://RandomNerdTutorials.com/esp32-email-alert-temperature-threshold/
+ 
   The original code has been substantially modified for use as
   an ESP32 freezer temperature alarm.
-
 
   Main library updates:
     - ESP32 Arduino core 3.x
