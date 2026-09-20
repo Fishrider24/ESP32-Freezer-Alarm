@@ -75,3 +75,22 @@ Set an App Password on your Gmail account!!
 Made a remix of a case on Thingiverse. https://www.thingiverse.com/thing:5193607
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/magnet.jpeg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/pageip.jpg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.jpg" width="200">
+
+## Credits
+
+This project was originally based on code and concepts from
+Random Nerd Tutorials.
+
+Original source:
+https://randomnerdtutorials.com/
+
+The original project has been substantially modified for use as an
+ESP32 freezer temperature alarm, including the web interface,
+WiFi Manager configuration, email notifications, OTA updates,
+SPIFFS management, temperature-unit selection, and other
+project-specific functionality.
+
+Original attribution and applicable license terms are retained
+for code derived from the original project.
+
+Modifications by Evan Potts.
