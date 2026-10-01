@@ -1,21 +1,11 @@
 /*
   ESP32 Freezer Alarm - updated for current ESP32 Arduino libraries
-  
-  Originally based on projects and code by Rui Santos / Sara Santos Random Nerd Tutorials.
-  Original sources:
-  ESP32 Wi-Fi Manager / AsyncWebServer:
-  https://RandomNerdTutorials.com/esp32-wi-fi-manager-asyncwebserver/
-  ESP32 Filesystem Uploader:
-  https://randomnerdtutorials.com/install-esp32-filesystem-uploader-arduino-ide/
-  ESP32 DS18B20 Temperature:
-  https://randomnerdtutorials.com/esp32-ds18b20-temperature-arduino-ide/
-  ESP32 Wi-Fi Reconnection:
-  https://RandomNerdTutorials.com/solved-reconnect-esp32-to-wifi/
-  ESP32 Email Alert Temperature Threshold:
-  https://RandomNerdTutorials.com/esp32-email-alert-temperature-threshold/
- 
-  The original code has been substantially modified for use as
-  an ESP32 freezer temperature alarm.
+
+  Original Wi-Fi Manager/web-server structure was based in part on:
+  Rui Santos & Sara Santos - Random Nerd Tutorials
+  https://randomnerdtutorials.com/esp32-wi-fi-manager-asyncwebserver/
+
+  This project has been substantially modified for a freezer alarm application.
 
   Main library updates:
     - ESP32 Arduino core 3.x
@@ -50,14 +40,13 @@
 
 // DS18B20 data wire is connected to GPIO 4.
 #define ONE_WIRE_BUS 4
+OneWire* oneWire;
+DallasTemperature* sensors;
 // BOOT button on standard ESP32 development boards.
 #define BOOT_BUTTON_PIN 0
 // InfluxDB Settings
 InfluxDBClient client;
 Point sensorReadings("temperature");
-
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);
 
 // -----------------------------------------------------------------------------
 // Temperature / timing
@@ -165,6 +154,7 @@ const char* PARAM_INFLUX_PASSWORD = "influx_password";
 const char* PARAM_INFLUX_MEASUREMENT = "influx_measurement";
 const char* PARAM_TIME_FORMAT = "time_format";
 const char* PARAM_TIME_ZONE = "time_zone";
+const char* PARAM_SENSOR_PIN = "pin";
 const char* reboot = "reboot";
 const char* otaUsername = "admin";
 const char* otaPassword = "freezeralarm";  //<----- Change this to a secure password for OTA updates
@@ -178,6 +168,7 @@ String pass;
 String ip;
 String emailSender;
 String emailSenderPass;
+String sensorPin;
 
 const char* freezernamePath = "/freezername.txt";
 const char* ssidPath = "/ssid.txt";
@@ -198,6 +189,7 @@ const char* influxDatabasePath = "/influxdatabase.txt";
 const char* influxUsernamePath = "/influxusername.txt";
 const char* influxPasswordPath = "/influxpassword.txt";
 const char* influxMeasurementPath = "/influxmeasurement.txt";
+const char* sensorPinPath = "/sensorpin.txt";
 
 IPAddress localIP;
 String gatewayIP;
@@ -275,10 +267,10 @@ void writeFile(fs::FS &fs, const char* path, const char* message) {
 // -----------------------------------------------------------------------------
 
 bool readTemperature() {
-  sensors.requestTemperatures();
+  sensors->requestTemperatures();
 
-  float tempC = sensors.getTempCByIndex(0);
-  float tempF = sensors.getTempFByIndex(0);
+  float tempC = sensors->getTempCByIndex(0);
+  float tempF = sensors->getTempFByIndex(0);
 
   // DS18B20 returns approximately -127 C / -196.6 F when disconnected.
   if (tempC <= -126.0f || tempF <= -196.0f) {
@@ -419,6 +411,9 @@ String processor(const String& var) {
   }
   else if (var == "TIME_FORMAT_24") {
     return timeFormat == "24" ? "selected" : "";
+  }
+  else if (var == "SENSOR_PIN") {
+    return sensorPin;
   }
   return String();
 }
@@ -697,6 +692,14 @@ void handleWiFiManagerParameter(const AsyncWebParameter* p) {
   else if (p->name() == PARAM_INFLUX_MEASUREMENT && p->value().length() > 0) {
     influxMeasurement = p->value();
     writeFile(SPIFFS, influxMeasurementPath, influxMeasurement.c_str());
+  }
+  else if (p->name() == PARAM_SENSOR_PIN && p->value().length() > 0) {
+  sensorPin = p->value();
+
+  writeFile(SPIFFS, sensorPinPath, sensorPin.c_str());
+
+  Serial.print("Sensor pin set to: ");
+  Serial.println(sensorPin);
   }
 }
 
@@ -1277,6 +1280,9 @@ void createDefaultFiles() {
 
   if (!SPIFFS.exists("/timezone.txt"))
     writeFile(SPIFFS, "/timezone.txt", "CST6CDT,M3.2.0,M11.1.0");
+
+  if (!SPIFFS.exists(sensorPinPath))
+    writeFile(SPIFFS, sensorPinPath, "4");
 }
 
 // -----------------------------------------------------------------------------
@@ -1421,6 +1427,7 @@ void setup() {
   inputMessage2 = readFile(SPIFFS, inputMessage2Path);
   inputMessage3 = readFile(SPIFFS, inputMessage3Path);
   tempUnit = readFile(SPIFFS, tempUnitPath);
+  sensorPin = readFile(SPIFFS, sensorPinPath);
   influxEnabled = readFile(SPIFFS, influxEnabledPath);
   influxServer = readFile(SPIFFS, influxServerPath);
   influxPort = readFile(SPIFFS, influxPortPath);
@@ -1475,8 +1482,11 @@ void setup() {
   }
 
 // Start the DS18B20 library once during setup.
-  sensors.begin();
-  sensors.setResolution(12);
+  int pin = sensorPin.toInt();
+  oneWire = new OneWire(pin);
+  sensors = new DallasTemperature(oneWire);
+  sensors->begin();
+  sensors->setResolution(12);
   readTemperature();
 
   if (influxEnabled == "true") {
