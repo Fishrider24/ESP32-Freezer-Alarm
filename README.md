@@ -72,9 +72,11 @@ Board settings in Arduino.&emsp;&emsp;&emsp;&emsp;&emsp;~~~***After first power-
 
 Set an App Password on your Gmail account!!
 
-Made a remix of a case on Thingiverse. https://www.thingiverse.com/thing:5193607
+Made a remix of a case on Thingiverse for ESP-32s https://www.thingiverse.com/thing:5193607
 
 <img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/magnet.jpeg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/pageip.jpg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/wifisetup.jpg" width="200">
+
+Made a remix of a case on Thingiverse for ESP-32U https://www.thingiverse.com/thing:7416937
 
 ## License
 
