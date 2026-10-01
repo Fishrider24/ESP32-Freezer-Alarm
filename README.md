@@ -1,5 +1,7 @@
 # ESP32-Freezer-Alarm Version 2.6 (3d printed case at bottom)
 
+2.7 Added 'Pin' field into wifimanager, so you can set what pin you solder your DS18B20 into.  Also remixed box on thingiverse for an ESP32-wroom-32u.
+
 2.6 Added persistent notification.  On the main page any email fails or sent emails will be a popup and they will always show the last ten, with timestamps, until you press OK.  This way if there are any problems with your email setup, you will be able to know. Also removed txt.att.com, due to it no longer working.  Added comments on Readme on my work around on iPhone.  Added Dark Mode to the wifimanager screen, a link for finding your timezone and notes on Email Sender use.
 
 2.5 Added Spiffs file upload, so if you just want to change index.html, other files don't get wiped. Cleaned up some html and added links after uploads/updates.
@@ -78,7 +80,7 @@ Made a remix of a case on Thingiverse for ESP-32s https://www.thingiverse.com/th
 
 Made a remix of a case on Thingiverse for ESP-32U https://www.thingiverse.com/thing:7416937
 
-<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/esp32ubottom.jpeg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/esp32utop.jpg" width="200">
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/esp32ubottom.jpg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/esp32utop.jpg" width="200">
 
 ## License
 
