@@ -78,6 +78,8 @@ Made a remix of a case on Thingiverse for ESP-32s https://www.thingiverse.com/th
 
 Made a remix of a case on Thingiverse for ESP-32U https://www.thingiverse.com/thing:7416937
 
+<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/esp32ubottom.jpeg" width="200">&emsp;&emsp;<img src="https://github.com/Fishrider24/ESP32-Freezer-Alarm/blob/main/images/esp32utop.jpg" width="200">
+
 ## License
 
 Original Freezer Alarm code and modifications by Evan Potts
