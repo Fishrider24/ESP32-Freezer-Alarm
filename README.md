@@ -1,4 +1,4 @@
-# ESP32-Freezer-Alarm Version 2.6 (3d printed case at bottom)
+# ESP32-Freezer-Alarm Version 2.7 (3d printed cases at bottom)
 
 2.7 Added 'Pin' field into wifimanager, so you can set what pin you solder your DS18B20 into.  Also remixed box on thingiverse for an ESP32-wroom-32u.
 
